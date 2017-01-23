@@ -17,6 +17,7 @@ class Combat extends preact.Component {
         this.state = { // Variáveis do jogo
             turn: 0,
             select: 3, // Por enquanto só há um player
+            shoot: false
         };
         this.newTurn = this.newTurn.bind(this);
         this.select = this.select.bind(this);
@@ -24,19 +25,22 @@ class Combat extends preact.Component {
 
     newTurn() {
         this.setState({
-            turn: this.state.turn+1
-        });
+            shoot: true,
+            turn: this.state.turn+1,
+        },()=>{console.log(`New Turn 1`);});
     }
 
     select(id) {
         this.setState({
+            shoot: false,
             select: id
-        });
+        },()=>{console.log(`Select 1`);});
     }
 
     render() {
+
         return(
-            h("g",{},[
+            h("g",{id:"gameCanvas"},[
                 h(Player,{
                     select: this.props.select,
                     grid: this.props.grid,
@@ -48,7 +52,12 @@ class Combat extends preact.Component {
                         fill:"green",
                         onClick:this.newTurn
                     }
-                )
+                ),
+                h(Shot,{
+                    select: this.state.select,
+                    grid: this.props.grid,
+                    update: this.state.shoot
+                })
             ])
         )
     }
@@ -88,7 +97,6 @@ class Chip extends preact.Component {
 
     select(id) {
         this.props.update(this.props.id); // HERE we change the select state in Combat
-        console.log("Selected");
 
     }
 
@@ -104,10 +112,28 @@ class Chip extends preact.Component {
 }
 
 class Shot extends preact.Component {
+    constructor() {
+        super();
+    }
+/*
+    shouldComponentUpdate() {
+        return this.props.update;
+    }
+*/
+    componentDidUpdate() {
+        console.log('bang!');
+    }
+
     render() {
         const radius = 5;
+        const shooterWidth = 50;
+
         return h("circle",{
+            className: "shot",
             r: radius,
+            cx: 200 + shooterWidth,
+            cy: this.props.grid[this.props.select - 1],
+            fill: "blue"
         })
         // Fires a shot, or a Shot component
     }
