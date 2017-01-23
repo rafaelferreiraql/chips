@@ -26,7 +26,6 @@ class Combat extends preact.Component {
         this.setState({
             turn: this.state.turn+1
         });
-        console.log(this.state);
     }
 
     select(id) {
@@ -88,8 +87,9 @@ class Chip extends preact.Component {
     }
 
     select(id) {
-        this.props.update(this.props.id);
+        this.props.update(this.props.id); // HERE we change the select state in Combat
         console.log("Selected");
+
     }
 
     render() {
