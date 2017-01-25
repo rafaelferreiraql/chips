@@ -1,5 +1,5 @@
 // Range function from underscore.js
-range = function(start, stop, step) {
+const range = function(start, stop, step) {
    if (stop == null) {
      stop = start || 0;
      start = 0;
@@ -15,3 +15,7 @@ range = function(start, stop, step) {
 
    return range;
  };
+
+const svgDraw = function(el) {
+    return document.createElementNS("http://www.w3.org/2000/svg",el)
+}

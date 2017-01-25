@@ -115,11 +115,7 @@ class Shot extends preact.Component {
     constructor() {
         super();
     }
-/*
-    shouldComponentUpdate() {
-        return this.props.update;
-    }
-*/
+
     componentDidUpdate() {
         console.log('bang!');
     }
