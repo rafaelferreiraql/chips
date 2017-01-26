@@ -170,26 +170,25 @@ let Game = function() {
                         canvas.getElementsByClassName("shot")[0].remove();
                     },
 
-                    // Clean later, it's dirty
                     switch: function(sel1,sel2) {
-
                         let data = this.data;
-                        let selections = [sel1,sel2];
                         const chip1 = canvas.getElementsByClassName(sel1)[0];
                         const chip2 = canvas.getElementsByClassName(sel2)[0];
                         let position1 = data.positions[sel1-1];
                         let position2 = data.positions[sel2-1];
+
                         const step = 5;
                         let animation = setInterval(frame,5);
 
                         function frame() {
                             if(Math.abs(position1 - data.positions[sel2-1]) < step+1) {
                                 clearInterval(animation);
+                                position1 = data.positions[sel2-1];
+                                position2 = data.positions[sel1-1];
                                 chip1.setAttribute("class",sel2);
                                 chip2.setAttribute("class",sel1);
                                 chip1.onclick = function() {combat.select(sel2)};
                                 chip2.onclick = function() {combat.select(sel1)};
-                                console.log(`Position1: ${position1}, Position2: ${position2}`);
                             }
 
                             else {
@@ -206,10 +205,6 @@ let Game = function() {
                                 chip2.style.y = position2;
                             }
                         }
-                        /*
-                        chip1.setAttribute("class",sel2);
-                        chip2.setAttribute("class",sel1);
-                        */
                     }
                 },
             } // Close Return
