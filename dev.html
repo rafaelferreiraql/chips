@@ -2,8 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Chips</title>
-        <script src="lib/preact.dev.js" charset="utf-8"></script>
+        <title>Chips!</title>
         <script src="assets/helperFuncs.js" charset="utf-8"></script>
     </head>
     <body>
@@ -11,18 +10,6 @@
 
         </svg>
 
-        <script type="text/javascript">
-            const h = preact.h;
-            const render = preact.render;
-        </script>
-
-        <script src="assets/game.js" charset="utf-8"></script>
-
-        <script type="text/javascript">
-            render(h(Game,{
-                height: document.getElementById("game").getBoundingClientRect().height
-            }),
-            document.getElementById("game"))
-        </script>
+        <script src="assets/engine.js" charset="utf-8"></script>
     </body>
 </html>
