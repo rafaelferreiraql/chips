@@ -18,4 +18,47 @@ const range = function(start, stop, step) {
 
 const svgDraw = function(el) {
     return document.createElementNS("http://www.w3.org/2000/svg",el)
-}
+};
+
+/*! lunar.js v1.1.0 | (c) 2016 @toddmotto | https://github.com/toddmotto/lunar */
+(function (root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define(factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory;
+  } else {
+    root.lunar = factory();
+  }
+})(this, function () {
+
+  'use strict';
+
+  function get(el) {
+    var cl = el.getAttribute('class');
+    return (cl === null ? "" : cl);
+  }
+
+  function has(elem, name) {
+    return new RegExp('(\\s|^)' + name + '(\\s|$)').test(get(elem));
+  }
+
+  function add(elem, name) {
+    !has(elem, name) && elem.setAttribute('class', (get(elem) && get(elem) + ' ') + name);
+  }
+
+  function remove(elem, name) {
+    var news = get(elem).replace(new RegExp('(\\s|^)' + name + '(\\s|$)', 'g'), '$2');
+    has(elem, name) && elem.setAttribute('class', news);
+  }
+
+  function toggle(elem, name) {
+    (has(elem, name) ? remove : add)(elem, name);
+  }
+
+  return {
+    hasClass: has,
+    addClass: add,
+    removeClass: remove,
+    toggleClass: toggle
+  };
+});

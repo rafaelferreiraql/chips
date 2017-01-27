@@ -1,6 +1,10 @@
 function gameGraphics() {
 
     let canvas = document.getElementById("game");
+    let DOM = {
+        height: document.getElementById("game").getBoundingClientRect().height,
+        width: document.getElementById("game").getBoundingClientRect().width,
+    }
 
     return {
 
@@ -15,10 +19,6 @@ function gameGraphics() {
                     return (DOM.height/(array.length+1))*v;
                 }),
             },
-
-            grid: range(1,6).map((v,_,array) => {
-                return (DOM.height/(array.length+1))*v;
-            }),
 
             draw: function() {
                 canvas.innerHTML = "";
@@ -40,11 +40,8 @@ function gameGraphics() {
                     rect.style.x = Game.Graphics.combat.data.chipX;
                     rect.style.y = self.data.positions[index];
 
-                    // rect.setAttribute("height",dim);
-                    // rect.setAttribute("width",dim);
-                    // rect.setAttribute("x",Game.Graphics.combat.data.chipX);
-                    // rect.setAttribute("y",self.data.positions[index]);
-                    rect.setAttribute("class",index+1);
+                    lunar.addClass(rect, "chip "+(index+1));
+
                     rect.onclick = function() {combat.select(index+1)}
                 })
             },
@@ -65,11 +62,11 @@ function gameGraphics() {
                 let shot = canvas.appendChild(svgDraw("circle"));
                 let chipsize = this.data.chipDim;
 
-                shot.style.cx = 20;
+                shot.style.cx = this.data.chipX + chipsize;
                 shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
-                shot.style.fill = "blue"
-                shot.setAttribute("class","shot");
+                shot.style.fill = "blue";
+                lunar.addClass(shot,"shot");
 
                 this.shotMove();
             },
@@ -110,13 +107,24 @@ function gameGraphics() {
 
                 function frame() {
                     if(Math.abs(position1 - data.positions[sel2-1]) < step+1) {
+                        // Stopping the updates
                         clearInterval(animation);
-                        position1 = data.positions[sel2-1];
-                        position2 = data.positions[sel1-1];
-                        chip1.setAttribute("class",sel2);
-                        chip2.setAttribute("class",sel1);
+
+                        // Correcting the positions
+                        chip1.style.y = data.positions[sel2-1];
+                        chip2.style.y = data.positions[sel1-1];
+
+                        // Re-classing the chips
+                        lunar.removeClass(chip1,sel1); lunar.addClass(chip1,sel2);
+                        lunar.removeClass(chip2,sel2); lunar.addClass(chip2,sel1);
+
+                        // Remaking the click interactions
                         chip1.onclick = function() {combat.select(sel2)};
                         chip2.onclick = function() {combat.select(sel1)};
+
+                        // Reflecting visual position change in the engine
+                        // chipData[sel1-1].pos = sel2;
+                        // chipData[sel2-1].pos = sel1;
                     }
 
                     else {
