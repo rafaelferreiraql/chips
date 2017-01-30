@@ -4,6 +4,9 @@ function gameEngine() {
         init: function() {
             combat = Game.Engine.combat;
             Graphics = Game.Graphics;
+            P1 = Game.Player[0];
+            P2 = Game.Player[1];
+            canvas = gameCanvas;
 
             combat.start();
         },
@@ -23,42 +26,55 @@ function gameEngine() {
                     {id:3, pos:3},
                     {id:4, pos:4},
                     {id:5, pos:5}
-                ]
+                ],
             },
 
             start: function() {
                 chipData = this.data.p1chips;
-                Graphics.combat.draw();
+
+                canvas.node.innerHTML = "";
+                //Graphics.combat.drawChips(P1);
+                //Graphics.combat.drawChips(P2);
+                P1.draw();
+                P2.draw();
+                Graphics.combat.newTurnPH();
             },
 
             newTurn: function() {
-                let selected = combat.data.p1selected;
                 combat.data.turn += 1;
+                combat.turnAction(P1);
+                combat.turnAction(P2);
+            },
+
+            turnAction: function(player) {
+                let selected = player.selected;
                 if(combat.data.turn%5 === 0) {
-                    if(selected < 3) combat.switch(selected,selected+1);
-                    else if (selected > 3) combat.switch(selected,selected-1);
+                    player.swap();
                 }
                 else {
-                    combat.shoot();
+                    //combat.shoot(player);
+                    player.shoot();
                 }
             },
 
-            shoot: function() {
-                Graphics.combat.shoot(combat.data.p1selected);
+            shoot: function(player) {
+                player.shoot();
             },
 
-            select: function(sel) {
+            select: function(sel,player) {
+                player.selected = sel;
                 combat.data.p1selected = sel;
-                console.log(sel);
+                console.log(player.selected);
             },
 
-            switch: function(sel1,sel2) {
-                console.log(`${sel1} ${sel2} Switch`);
+            switch: function(sel1,sel2,player) {
 
-                chipData[sel1-1].pos = sel2;
-                chipData[sel2-1].pos = sel1;
+                player.chips[sel1-1].pos = sel2;
+                player.chips[sel2-1].pos = sel1;
 
-                Graphics.combat.switch(sel1,sel2);
+                console.log(player.chips);
+
+                Graphics.combat.switch(sel1,sel2,player);
             }
         },
     } // Close Return

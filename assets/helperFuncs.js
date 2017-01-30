@@ -20,6 +20,7 @@ const svgDraw = function(el) {
     return document.createElementNS("http://www.w3.org/2000/svg",el)
 };
 
+// Lunar by Todd Motto
 /*! lunar.js v1.1.0 | (c) 2016 @toddmotto | https://github.com/toddmotto/lunar */
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
