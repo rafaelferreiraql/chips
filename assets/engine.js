@@ -4,10 +4,7 @@ function gameEngine() {
         init: function() {
             combat = Game.Engine.combat;
             Graphics = Game.Graphics;
-            P1 = Game.Player[0];
-            P2 = Game.Player[1];
             canvas = gameCanvas;
-
             combat.start();
         },
 
@@ -19,22 +16,13 @@ function gameEngine() {
 
             data: {
                 turn: 0,
-                p1selected: 3,
-                p1chips: [
-                    {id:1, pos:1},
-                    {id:2, pos:2},
-                    {id:3, pos:3},
-                    {id:4, pos:4},
-                    {id:5, pos:5}
-                ],
             },
 
             start: function() {
-                chipData = this.data.p1chips;
+                P1 = new Player(p1data);
+                P2 = new Player(p2data);
 
                 canvas.node.innerHTML = "";
-                //Graphics.combat.drawChips(P1);
-                //Graphics.combat.drawChips(P2);
                 P1.draw();
                 P2.draw();
                 Graphics.combat.newTurnPH();
@@ -42,39 +30,32 @@ function gameEngine() {
 
             newTurn: function() {
                 combat.data.turn += 1;
-                combat.turnAction(P1);
-                combat.turnAction(P2);
-            },
-
-            turnAction: function(player) {
-                let selected = player.selected;
                 if(combat.data.turn%5 === 0) {
-                    player.swap();
+                    P1.swap();
+                    P2.swap();
                 }
                 else {
-                    //combat.shoot(player);
-                    player.shoot();
+                    combat.shoot();
                 }
             },
 
-            shoot: function(player) {
-                player.shoot();
+            shoot: function() {
+                // Shooting clash logic goes here
+                P1.shoot();
+                P2.shoot();
             },
 
             select: function(sel,player) {
+                //remember, selection here means the ID, not the position!
                 player.selected = sel;
-                combat.data.p1selected = sel;
-                console.log(player.selected);
+                console.log(sel);
             },
 
-            switch: function(sel1,sel2,player) {
+            switch: function(chip1,chip2,player) {
+                console.log(chip1);
+                console.log(chip2);
 
-                player.chips[sel1-1].pos = sel2;
-                player.chips[sel2-1].pos = sel1;
-
-                console.log(player.chips);
-
-                Graphics.combat.switch(sel1,sel2,player);
+                Graphics.combat.switch(chip1,chip2,player);
             }
         },
     } // Close Return

@@ -20,10 +20,9 @@ let Game = function() {
 
         Graphics: gameGraphics(),
 
-        Player: [player1,player2],
+//        Player: [player1,player2],
 
     } // Close Return
 }();
-
 
 Game.Engine.init();
