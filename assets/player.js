@@ -13,15 +13,14 @@ class Player {
         this.X = data.X;
         this.selected = 3;
         this.left = data.left;
-        console.log(data.chips[0]);
     }
 
     draw() {
         Graphics.combat.drawChips(this);
     }
 
-    shoot() {
-        Graphics.combat.shoot(this);
+    shoot(shotbreak) {
+        Graphics.combat.shoot(this,shotbreak);
     }
 
     select() {
@@ -47,18 +46,28 @@ class Player {
 const shots = {
     "fire": {
         color: "red",
+        dmg: 100,
+        weak: ["water","light"],
     },
     "ice": {
-        color:"lightblue",
+        color: "lightblue",
+        dmg: 100,
+        weak: ["fire","light"],
     },
     "water": {
-        color:"blue",
+        color: "blue",
+        dmg: 100,
+        weak: ["ice","light"],
     },
     "shadow": {
         color:"#444",
+        dmg: 150,
+        weak: ["fire","water","ice","light"],
     },
     "light": {
         color:"lightgrey",
+        dmg: 65,
+        weak: [],
     }
 }
 
@@ -89,6 +98,7 @@ const types = {
 let p1data = {
     tag: "P1",
     X: (gameCanvas.width)*0.15, // 15%
+    //X: "15%",
     left: true,
     chips: [
         types.light,
@@ -102,6 +112,7 @@ let p1data = {
 let p2data = {
     tag: "P2",
     X: (gameCanvas.width)*0.85, // 85%
+    //X: "85%",
     left: false,
     chips: [
         types.water,

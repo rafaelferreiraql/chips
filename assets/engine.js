@@ -26,6 +26,7 @@ function gameEngine() {
                 P1.draw();
                 P2.draw();
                 Graphics.combat.newTurnPH();
+                Graphics.combat.resizePH();
             },
 
             newTurn: function() {
@@ -40,9 +41,24 @@ function gameEngine() {
             },
 
             shoot: function() {
-                // Shooting clash logic goes here
-                P1.shoot();
-                P2.shoot();
+                // shotBreak() deals with the logic of whether the shot will
+                // break on the face of another shot in the same lane, see below
+                P1.shoot(this.shotBreak(P1,P2));
+                P2.shoot(this.shotBreak(P2,P1));
+            },
+
+            shotBreak: function(shooter,opponent) {
+                const shooterChip = shooter.chips[shooter.selected-1];
+                const opponentChip = opponent.chips[opponent.selected-1]
+                const shot = shooterChip.type.shot;
+                const opposing = opponentChip.type.shot;
+
+                if(shooterChip.pos !== opponentChip.pos) {
+                    return false;
+                }
+                else {
+                    return (shots[shot].weak.includes(opposing) || shot === opposing);
+                }
             },
 
             select: function(sel,player) {
@@ -52,9 +68,6 @@ function gameEngine() {
             },
 
             switch: function(chip1,chip2,player) {
-                console.log(chip1);
-                console.log(chip2);
-
                 Graphics.combat.switch(chip1,chip2,player);
             }
         },

@@ -28,7 +28,7 @@ function gameGraphics() {
 
                     rect.style.height = dim;
                     rect.style.width = dim;
-                    rect.style.x = player.X;
+                    rect.style.x = (player.left ? player.X : player.X-dim);
                     rect.style.y = self.data.positions[index];
                     rect.style.fill = player.chips[index].type.color;
 
@@ -43,7 +43,6 @@ function gameGraphics() {
             newTurnPH: function() {
                 // Botão verde debug para mudar a rodada manualmente
                 let turner = canvas.node.appendChild(svgDraw("rect"));
-                console.log("cheguei");
 
                 turner.setAttribute("height",30);
                 turner.setAttribute("width",30);
@@ -51,7 +50,22 @@ function gameGraphics() {
                 turner.addEventListener("click",combat.newTurn);
             },
 
-            shoot: function(player) {
+            resizePH: function() {
+                let sizer = canvas.node.appendChild(svgDraw("rect"));
+
+                sizer.setAttribute("height",30);
+                sizer.setAttribute("width",30);
+                sizer.setAttribute("y","50%");
+                sizer.setAttribute("fill","orange");
+                sizer.addEventListener("click",this.resize);
+            },
+
+            resize: function() {
+                console.log("escutei");
+                // Reset all X and Y coordinates of... everything?
+            },
+
+            shoot: function(player,half=false) {
                 let sel = player.selected;
                 let chip = canvas.node.getElementsByClassName(`${sel} ${player.tag}`)[0];
                 let shot = canvas.node.appendChild(svgDraw("circle"));
@@ -63,25 +77,26 @@ function gameGraphics() {
                 shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
                 shot.style.fill = shots[chipType.shot].color;
-                lunar.addClass(shot,"shot");
+                lunar.addClass(shot,"shot "+chipType.shot);
 
-                this.shotMove(player,shot);
+                this.shotMove(player,shot,half,chipType.shot);
             },
 
-            shotMove: function(player,shot) {
+            shotMove: function(player,shot,half,type) {
                 const self = this;
+                const oppX = (player === P1 ? P2.X : P1.X);
 
                 // Animate
                 let position = parseInt(shot.style.cx);
-                const posFinal = 500;
-                const frames = 60;
+                const posFinal = (half ? canvas.width/2 : oppX);
+                const frames = 60*(half ? 1 : 2);
                 const frameMov = (posFinal - position)/frames;
 
-                let animation = setInterval(frame,1/60);
+                let animation = setInterval(frame,1/frames);
                 function frame() {
                     if(Math.abs(position - posFinal) < 10) {
                         clearInterval(animation);
-                        self.eraseShot(shot);
+                        self.eraseShot(shot,type);
                     }
                     else {
                         position += frameMov;
@@ -90,8 +105,8 @@ function gameGraphics() {
                 }
             },
 
-            eraseShot: function(shot) {
-                canvas.node.getElementsByClassName("shot")[0].remove();
+            eraseShot: function(shot,type) {
+                canvas.node.getElementsByClassName(type)[0].remove();
             },
 
             switch: function(chipdata1,chipdata2,player) {
@@ -99,7 +114,7 @@ function gameGraphics() {
                 // Not called "chip" to avoid clashing with the DOM chip reference
                 const index1 = chipdata1.pos;
                 const index2 = chipdata2.pos;
-                let data = this.data;
+                const data = this.data;
                 const chip1 = canvas.node.getElementsByClassName(`${chipdata1.id} ${player.tag}`)[0];
                 const chip2 = canvas.node.getElementsByClassName(`${chipdata2.id} ${player.tag}`)[0];
                 let position1 = data.positions[index1-1];
