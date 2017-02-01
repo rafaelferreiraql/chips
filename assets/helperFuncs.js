@@ -112,3 +112,7 @@ if (!Array.prototype.includes) {
     }
   });
 }
+
+function onResize(callback) {
+    window.addEventListener("resize",callback);
+}

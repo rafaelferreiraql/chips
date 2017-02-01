@@ -10,17 +10,48 @@ class Player {
             {id:5, pos:5, type:data.chips[4]}
         ];
         this.tag = data.tag;
-        this.X = data.X;
-        this.selected = 3;
-        this.left = data.left;
+        this.X = data.X();
+        this.setX = data.X;
+        this.updateSelection(3);
+        /*
+            The above assigns:
+            -   this.selected;
+            -   this.selectedChip;
+            -   this.selectedShot.
+            Also, updates whenever it's called.
+         */
+        this.left = data.left; // Refers to the position of the player's chips
+        this.score = {
+            value: 0,
+            update: () => {
+                let score = canvas.node.getElementsByClassName(this.tag+" score");
+                score.innerHTML = this.value;
+            }
+        }
+    }
+
+    updateSelection(select) {
+        this.selected = select; // Refers to the chip ID, not the position!
+        this.selectedChip = this.chips[this.selected-1];
+        this.selectedShot = shots[this.selectedChip.type.shot];
+        console.log(this.selectedChip);
+        console.log(this.selectedShot);
     }
 
     draw() {
         Graphics.combat.drawChips(this);
     }
 
-    shoot(shotbreak) {
-        Graphics.combat.shoot(this,shotbreak);
+    drawScore() {
+        Graphics.combat.score(this);
+    }
+
+    shoot(willbreak) {
+        if(!willbreak) {
+            this.score.value += this.selectedShot.dmg;
+            console.log(`${this.tag}: ${this.selectedShot.dmg}`);
+        };
+        Graphics.combat.shoot(this,willbreak);
     }
 
     select() {
@@ -97,7 +128,7 @@ const types = {
 
 let p1data = {
     tag: "P1",
-    X: (gameCanvas.width)*0.15, // 15%
+    X: function() { return (gameCanvas.width)*0.15}, // 15%
     //X: "15%",
     left: true,
     chips: [
@@ -111,7 +142,7 @@ let p1data = {
 
 let p2data = {
     tag: "P2",
-    X: (gameCanvas.width)*0.85, // 85%
+    X: function() { return (gameCanvas.width)*0.85}, // 85%
     //X: "85%",
     left: false,
     chips: [

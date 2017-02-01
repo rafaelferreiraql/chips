@@ -19,11 +19,17 @@
                 height: document.getElementById("game").getBoundingClientRect().height,
                 width: document.getElementById("game").getBoundingClientRect().width,
             }
+
+            onResize(function() {
+                gameCanvas.height = document.getElementById("game").getBoundingClientRect().height;
+                gameCanvas.width = document.getElementById("game").getBoundingClientRect().width;
+            })
         </script>
 
         <script src="assets/player.js" charset="utf-8"></script>
         <script src="assets/engine.js" charset="utf-8"></script>
         <script src="assets/graphics.js" charset="utf-8"></script>
+        <script src="assets/ai.js" charset="utf-8"></script>
         <script src="assets/game.js" charset="utf-8"></script>
 
         <script type="text/javascript">

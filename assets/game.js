@@ -9,10 +9,14 @@ let Game = function() {
     let chipData;
     // Will be defined in combat.start()
 
-    let canvas, DOM;
+    let canvas;
     // The game container, defined in Engine.init()
 
+    // The players, defined in combat.start();
     let P1, P2;
+
+    // Artificial Intelligence, assigned in 
+    let AI;
 
     return {
 
@@ -20,7 +24,7 @@ let Game = function() {
 
         Graphics: gameGraphics(),
 
-//        Player: [player1,player2],
+        AI: gameAI(),
 
     } // Close Return
 }();

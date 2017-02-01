@@ -2,7 +2,7 @@ function gameGraphics() {
 
     let canvas = gameCanvas;
     // Already defined in Engine.init(), but Graphics.combat.data needs this
-    // since it's not functional.
+    // since it's not called. Might try to populate it on Engine.init().
 
     return {
 
@@ -37,7 +37,37 @@ function gameGraphics() {
                     // Imprints the actual index of the chip, since it's equal
                     // to the position when this below is assigned.
                     rect.onclick = function() {combat.select(index+1,player)}
+
+                    onResize(function() {
+                        rect.style.x = (player.left ? player.setX() : player.setX()-dim);
+                    })
                 })
+            },
+
+            score: function(player) {
+                if(!canvas.node.getElementsByClassName(player.tag+" score")[0]) {
+                    let score = canvas.node.appendChild(svgDraw("text"));
+                    let size = 50;
+                    //score.style.x = (player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
+                    //score.style.y = canvas.height - this.data.chipDim;
+                    score.setAttribute("x",
+                        player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
+                    score.setAttribute("y",
+                        canvas.height - this.data.chipDim);
+                    score.style.fontSize = size;
+                    score.innerHTML = player.score.value;
+                    lunar.addClass(score,player.tag+" score")
+                }
+                else {
+                    console.log("Já criou!");
+                    let score = canvas.node.getElementsByClassName(player.tag+" score")[0];
+                    score.innerHTML = player.score.value;
+                }
+
+                onResize(function() {
+                    score.style.x = (player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
+                })
+
             },
 
             newTurnPH: function() {
@@ -58,6 +88,7 @@ function gameGraphics() {
                 sizer.setAttribute("y","50%");
                 sizer.setAttribute("fill","orange");
                 sizer.addEventListener("click",this.resize);
+                // substituir por window.addEventListener(Graphics.combat.resize())
             },
 
             resize: function() {
@@ -97,6 +128,7 @@ function gameGraphics() {
                     if(Math.abs(position - posFinal) < 10) {
                         clearInterval(animation);
                         self.eraseShot(shot,type);
+                        self.score(player)
                     }
                     else {
                         position += frameMov;

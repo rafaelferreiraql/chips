@@ -19,12 +19,15 @@ function gameEngine() {
             },
 
             start: function() {
+                AI = Game.AI.random; // Type can be eventually chosen at the menu
                 P1 = new Player(p1data);
                 P2 = new Player(p2data);
 
                 canvas.node.innerHTML = "";
                 P1.draw();
                 P2.draw();
+                P1.drawScore();
+                P2.drawScore();
                 Graphics.combat.newTurnPH();
                 Graphics.combat.resizePH();
             },
@@ -41,13 +44,13 @@ function gameEngine() {
             },
 
             shoot: function() {
-                // shotBreak() deals with the logic of whether the shot will
+                // willBreak() deals with the logic of whether the shot will
                 // break on the face of another shot in the same lane, see below
-                P1.shoot(this.shotBreak(P1,P2));
-                P2.shoot(this.shotBreak(P2,P1));
+                P1.shoot(this.willBreak(P1,P2));
+                P2.shoot(this.willBreak(P2,P1));
             },
 
-            shotBreak: function(shooter,opponent) {
+            willBreak: function(shooter,opponent) {
                 const shooterChip = shooter.chips[shooter.selected-1];
                 const opponentChip = opponent.chips[opponent.selected-1]
                 const shot = shooterChip.type.shot;
@@ -63,7 +66,8 @@ function gameEngine() {
 
             select: function(sel,player) {
                 //remember, selection here means the ID, not the position!
-                player.selected = sel;
+                //player.selected = sel;
+                player.updateSelection(sel);
                 console.log(sel);
             },
 
