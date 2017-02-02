@@ -80,17 +80,6 @@ function gameGraphics() {
                 turner.addEventListener("click",combat.newTurn);
             },
 
-            resizePH: function() {
-                let sizer = canvas.node.appendChild(svgDraw("rect"));
-
-                sizer.setAttribute("height",30);
-                sizer.setAttribute("width",30);
-                sizer.setAttribute("y","50%");
-                sizer.setAttribute("fill","orange");
-                sizer.addEventListener("click",this.resize);
-                // substituir por window.addEventListener(Graphics.combat.resize())
-            },
-
             resize: function() {
                 console.log("escutei");
                 // Reset all X and Y coordinates of... everything?

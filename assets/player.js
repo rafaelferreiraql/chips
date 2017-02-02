@@ -27,15 +27,14 @@ class Player {
                 let score = canvas.node.getElementsByClassName(this.tag+" score");
                 score.innerHTML = this.value;
             }
-        }
+        };
+        this.AI = (data.ai ? new data.ai(this) : null);
     }
 
     updateSelection(select) {
         this.selected = select; // Refers to the chip ID, not the position!
         this.selectedChip = this.chips[this.selected-1];
         this.selectedShot = shots[this.selectedChip.type.shot];
-        console.log(this.selectedChip);
-        console.log(this.selectedShot);
     }
 
     draw() {
@@ -49,7 +48,6 @@ class Player {
     shoot(willbreak) {
         if(!willbreak) {
             this.score.value += this.selectedShot.dmg;
-            console.log(`${this.tag}: ${this.selectedShot.dmg}`);
         };
         Graphics.combat.shoot(this,willbreak);
     }
@@ -151,7 +149,8 @@ let p2data = {
         types.water,
         types.water,
         types.water,
-    ]
+    ],
+    ai: RandomAI,
 }
 
 //let player1 = new Player(p1data);

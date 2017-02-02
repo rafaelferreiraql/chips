@@ -15,7 +15,7 @@ let Game = function() {
     // The players, defined in combat.start();
     let P1, P2;
 
-    // Artificial Intelligence, assigned in 
+    // Artificial Intelligence, assigned in
     let AI;
 
     return {
@@ -23,8 +23,6 @@ let Game = function() {
         Engine: gameEngine(),
 
         Graphics: gameGraphics(),
-
-        AI: gameAI(),
 
     } // Close Return
 }();

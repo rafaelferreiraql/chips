@@ -19,7 +19,6 @@ function gameEngine() {
             },
 
             start: function() {
-                AI = Game.AI.random; // Type can be eventually chosen at the menu
                 P1 = new Player(p1data);
                 P2 = new Player(p2data);
 
@@ -29,7 +28,6 @@ function gameEngine() {
                 P1.drawScore();
                 P2.drawScore();
                 Graphics.combat.newTurnPH();
-                Graphics.combat.resizePH();
             },
 
             newTurn: function() {
@@ -41,6 +39,8 @@ function gameEngine() {
                 else {
                     combat.shoot();
                 }
+
+                P2.AI.select();
             },
 
             shoot: function() {
