@@ -9,6 +9,10 @@ class Player {
             {id:4, pos:4, type:data.chips[3]},
             {id:5, pos:5, type:data.chips[4]}
         ];
+        this.chips.forEach(function(chip,index) {
+            chip.shot = shots[chip.type.shot];
+            chip.shot.name = chip.type.shot;
+        });
         this.tag = data.tag;
         this.X = data.X();
         this.setX = data.X;
@@ -17,7 +21,6 @@ class Player {
             The above assigns:
             -   this.selected;
             -   this.selectedChip;
-            -   this.selectedShot.
             Also, updates whenever it's called.
          */
         this.left = data.left; // Refers to the position of the player's chips
@@ -34,7 +37,6 @@ class Player {
     updateSelection(select) {
         this.selected = select; // Refers to the chip ID, not the position!
         this.selectedChip = this.chips[this.selected-1];
-        this.selectedShot = shots[this.selectedChip.type.shot];
     }
 
     draw() {
@@ -47,7 +49,7 @@ class Player {
 
     shoot(willbreak) {
         if(!willbreak) {
-            this.score.value += this.selectedShot.dmg;
+            this.score.value += this.selectedChip.shot.dmg;
         };
         Graphics.combat.shoot(this,willbreak);
     }
@@ -123,35 +125,3 @@ const types = {
         shot: "light",
     }
 }
-
-let p1data = {
-    tag: "P1",
-    X: function() { return (gameCanvas.width)*0.15}, // 15%
-    //X: "15%",
-    left: true,
-    chips: [
-        types.light,
-        types.ice,
-        types.water,
-        types.fire,
-        types.shadow,
-    ]
-}
-
-let p2data = {
-    tag: "P2",
-    X: function() { return (gameCanvas.width)*0.85}, // 85%
-    //X: "85%",
-    left: false,
-    chips: [
-        types.water,
-        types.water,
-        types.water,
-        types.water,
-        types.water,
-    ],
-    ai: RandomAI,
-}
-
-//let player1 = new Player(p1data);
-//let player2 = new Player(p2data);

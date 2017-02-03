@@ -6,9 +6,39 @@ function gameGraphics() {
 
     return {
 
-        global: {},
+        global: {
+
+            start: function() {
+                let startButton = canvas.node.appendChild(svgDraw("g"));
+
+                let startRect = startButton.appendChild(svgDraw("rect"));
+                startRect.style.height = canvas.height/10;
+                startRect.style.width = canvas.width/5;
+                startRect.style.x = canvas.width/2 - canvas.width/10;
+
+                let startText = startButton.appendChild(svgDraw("text"));
+                startText.style.fontSize = canvas.height/12;
+                startText.style.fill = "white";
+                startText.setAttribute("x",startRect.style.x);
+                startText.setAttribute("y",startRect.style.height)
+                startText.innerHTML = "START!";
+
+                startButton.addEventListener("click",function() {
+                    combat.start();
+                });
+            }
+        },
 
         combat: {
+
+            start: function() {
+                canvas.node.innerHTML = "";
+                P1.draw();
+                P2.draw();
+                P1.drawScore();
+                P2.drawScore();
+                Graphics.combat.newTurnPH();
+            },
 
             data: {
                 chipDim: 50,
@@ -48,13 +78,12 @@ function gameGraphics() {
                 if(!canvas.node.getElementsByClassName(player.tag+" score")[0]) {
                     let score = canvas.node.appendChild(svgDraw("text"));
                     let size = 50;
-                    //score.style.x = (player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
-                    //score.style.y = canvas.height - this.data.chipDim;
                     score.setAttribute("x",
                         player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
                     score.setAttribute("y",
                         canvas.height - this.data.chipDim);
                     score.style.fontSize = size;
+                    score.style.userSelect = "none";
                     score.innerHTML = player.score.value;
                     lunar.addClass(score,player.tag+" score")
                 }
@@ -71,13 +100,33 @@ function gameGraphics() {
             },
 
             newTurnPH: function() {
-                // Botão verde debug para mudar a rodada manualmente
-                let turner = canvas.node.appendChild(svgDraw("rect"));
+                if(canvas.node.getElementsByClassName("nextTurn")[0]) {
+                    let turner = canvas.node.getElementsByClassName("nextTurn")[0];
+                    let text;
+                    if(combat.data.turn === combat.data.lastTurn) text = "End";
+                    else if((combat.data.turn + 1) % 5 !== 0) text = "Shoot!";
+                    else text = "Switch!";
 
-                turner.setAttribute("height",30);
-                turner.setAttribute("width",30);
-                turner.setAttribute("fill","green");
-                turner.addEventListener("click",combat.newTurn);
+                    turner.innerHTML = text;
+                }
+
+                else {
+                    // Botão verde debug para mudar a rodada manualmente
+                    let turner = canvas.node.appendChild(svgDraw("text"));
+                    lunar.addClass(turner,"nextTurn");
+
+                    turner.innerHTML = "Shoot!";
+
+                    turner.style.userSelect = "none";
+                    turner.style.fontSize = 40;
+
+                    turner.setAttribute("height",30);
+                    turner.setAttribute("width",30);
+                    turner.setAttribute("fill","green");
+                    turner.setAttribute("x",canvas.width/2);
+                    turner.setAttribute("y",40);
+                    turner.addEventListener("click",combat.newTurn);
+                }
             },
 
             resize: function() {
@@ -96,6 +145,7 @@ function gameGraphics() {
                     player.X + chipsize : player.X);
                 shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
+                shot.style.stroke = 
                 shot.style.fill = shots[chipType.shot].color;
                 lunar.addClass(shot,"shot "+chipType.shot);
 
@@ -173,6 +223,26 @@ function gameGraphics() {
                         chip2.style.y = position2;
                     }
                 }
+            },
+
+            end: function() {
+                let winner;
+                if(P1.score.value === P2.score.value) {
+                    winner = "Nobody";
+                }
+                else if (P1.score.value > P2.score.value) {
+                    winner = "Player 1";
+                }
+                else {
+                    winner = "Player 2";
+                }
+                canvas.node.innerHTML = "";
+                let endText = canvas.node.appendChild(svgDraw("text"));
+                endText.innerHTML = `${winner} won! Try again?`;
+                endText.style.fontSize = 50;
+                endText.setAttribute("y",50);
+                endText.addEventListener("click",combat.start);
+
             }
         },
     } // Close Return

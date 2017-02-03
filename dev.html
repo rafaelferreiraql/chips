@@ -4,6 +4,11 @@
         <meta charset="utf-8">
         <title>Chips!</title>
         <script src="assets/helperFuncs.js" charset="utf-8"></script>
+        <style media="screen">
+            p {
+                font-size: 1.5em;
+            }
+        </style>
     </head>
     <body>
         <svg id="game" width="100%" height="500">
@@ -13,18 +18,7 @@
 
         </p>
 
-        <script type="text/javascript">
-            let gameCanvas = {
-                node: document.getElementById("game"),
-                height: document.getElementById("game").getBoundingClientRect().height,
-                width: document.getElementById("game").getBoundingClientRect().width,
-            }
-
-            onResize(function() {
-                gameCanvas.height = document.getElementById("game").getBoundingClientRect().height;
-                gameCanvas.width = document.getElementById("game").getBoundingClientRect().width;
-            })
-        </script>
+        <script src="assets/basic.js" charset="utf-8"></script>
 
         <script src="assets/ai.js" charset="utf-8"></script>
         <script src="assets/player.js" charset="utf-8"></script>

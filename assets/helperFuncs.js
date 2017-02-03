@@ -16,6 +16,15 @@ const range = function(start, stop, step) {
    return range;
  };
 
+// Get average of array elements
+const sum = function(array) {
+    if(array.length === 0) return 0;
+    else return array.reduce(function(total,el) {
+        return total + el
+    })
+
+}
+
 const svgDraw = function(el) {
     return document.createElementNS("http://www.w3.org/2000/svg",el)
 };

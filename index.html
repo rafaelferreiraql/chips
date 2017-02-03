@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Chips!</title>
+        <script src="assets/helperFuncs.js" charset="utf-8"></script>
+        <style media="screen">
+            p {
+                font-size: 1.5em;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="game" width="100%" height="500">
+
+        </svg>
+
+        <script src="assets/basic.js" charset="utf-8"></script>
+
+        <script src="assets/ai.js" charset="utf-8"></script>
+        <script src="assets/player.js" charset="utf-8"></script>
+        <script src="assets/engine.js" charset="utf-8"></script>
+        <script src="assets/graphics.js" charset="utf-8"></script>
+        <script src="assets/game.js" charset="utf-8"></script>
+
+        <p>
+            This here is my first game ever, "Chips". It's an early work in progress, with basic graphics
+            (and even instructions here with barely any CSS), but the engine's core is working quite well.
+        </p>
+        <p>
+            <b>Instructions:</b>
+            <p>
+                You and your opponent have five elements, called "chips", that shoot each other. You're the
+                one in the left, your opponent is in the right. They shoot bullets at the opposing chips on
+                the same y axis, but one at a time. To choose which chip will shoot, you pick one by clicking
+                on them. You actually shoot by clicking the green "Shoot!" text. Each time your shot hits the target,
+                you're awarded points.
+                <p>
+                    Whenever shots meet, they interact in such ways:
+                </p>
+            </p>
+            <p><b>Water (blue):</b> Wins over red shots, loses to light blue shots;</p>
+            <p><b>Fire (red):</b> Wins over light blue shots, loses to blue shots;</p>
+            <p><b>Ice (light blue):</b> Wins over blue shots, loses to red shots;</p>
+            <p><b>Shadow (dark grey):</b> Loses to all shots, gives you more points when it hits;</p>
+            <p><b>Light (light grey):</b> Wins over all shots, gives you less points when it hits;</p>
+            <p>
+                In case you're wondering, water, fire and ice shots give you 100 points,
+                shadow shots give you 150 points, and light shots give you 65 points.
+            </p>
+            <p>
+                Once in every five turns, the players have an opportunity to swap places of two
+                neighboring chips. It's called a "switch turn". In this case, if you select a chip
+                above the middle one, the selected chip will swap places with the one directly below it.
+                Otherwise, if you choose a chip below the middle one, it'll swap places with the one above it.
+                If you select the middle one, your chips will not change position at all.
+            </p>
+
+            <p>
+                Currently, the game ends in the 30th turn, and whoever gets the most points wins.
+                Don't feel bad if you lose, right now you and your opponent's chips are given randomly,
+                so it's possible you've been given a bad deck. Hope you enjoy this early draft!
+            </p>
+
+        </p>
+    </body>
+</html>

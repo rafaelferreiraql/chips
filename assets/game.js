@@ -10,13 +10,16 @@ let Game = function() {
     // Will be defined in combat.start()
 
     let canvas;
-    // The game container, defined in Engine.init()
+    // The game container, defined in Engine.init();
 
-    // The players, defined in combat.start();
+    let p1data, p2data;
+    // Player data, defines unique properties of each player;
+
+    let shots, chips;
+    // data on types of shots and chips;
+
     let P1, P2;
-
-    // Artificial Intelligence, assigned in
-    let AI;
+    // The players, defined in combat.start();
 
     return {
 
