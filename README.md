@@ -3,3 +3,4 @@ A small (WIP) HTML5 game I'm making. I just started, so if you happen to stumble
 
 ## Known bugs
 * If you resize the window, some things will break.
+* Sometimes the AI breaks for whatever reason (related to the algorithm it uses to choose a chip to use). Still not found the source.

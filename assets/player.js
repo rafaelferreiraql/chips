@@ -32,6 +32,7 @@ class Player {
             }
         };
         this.AI = (data.ai ? new data.ai(this) : null);
+        this.keycodes = data.keys;
     }
 
     updateSelection(select) {
@@ -71,57 +72,5 @@ class Player {
             this);
         }
         else console.log("No Switch");
-    }
-}
-
-const shots = {
-    "fire": {
-        color: "red",
-        dmg: 100,
-        weak: ["water","light"],
-    },
-    "ice": {
-        color: "lightblue",
-        dmg: 100,
-        weak: ["fire","light"],
-    },
-    "water": {
-        color: "blue",
-        dmg: 100,
-        weak: ["ice","light"],
-    },
-    "shadow": {
-        color:"#444",
-        dmg: 150,
-        weak: ["fire","water","ice","light"],
-    },
-    "light": {
-        color:"lightgrey",
-        dmg: 65,
-        weak: [],
-    }
-}
-
-// Trocar nome de variável depois, ou mover pra outro escopo já!
-const types = {
-    "fire": {
-        color: "red",
-        shot: "fire",
-    },
-    "ice": {
-        color:"lightblue",
-        shot: "ice",
-    },
-    "water": {
-        color:"blue",
-        shot: "water",
-    },
-    "shadow": {
-        color:"#444",
-        shot: "shadow",
-    },
-    "light": {
-        color:"lightgrey",
-        shot: "light",
     }
 }

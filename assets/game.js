@@ -15,7 +15,7 @@ let Game = function() {
     let p1data, p2data;
     // Player data, defines unique properties of each player;
 
-    let shots, chips;
+    let shots, types;
     // data on types of shots and chips;
 
     let P1, P2;

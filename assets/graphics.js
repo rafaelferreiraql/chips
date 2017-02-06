@@ -9,24 +9,126 @@ function gameGraphics() {
         global: {
 
             start: function() {
-                let startButton = canvas.node.appendChild(svgDraw("g"));
+                let singleButton = this.drawOption(canvas.width/2,3,"Single Player",
+                    global.singlePlayer);
 
-                let startRect = startButton.appendChild(svgDraw("rect"));
-                startRect.style.height = canvas.height/10;
-                startRect.style.width = canvas.width/5;
-                startRect.style.x = canvas.width/2 - canvas.width/10;
+                let multiButton = this.drawOption(canvas.width/2,5,"Multi Player",
+                    global.multiPlayer);
 
-                let startText = startButton.appendChild(svgDraw("text"));
-                startText.style.fontSize = canvas.height/12;
-                startText.style.fill = "white";
-                startText.setAttribute("x",startRect.style.x);
-                startText.setAttribute("y",startRect.style.height)
-                startText.innerHTML = "START!";
+                let cpuButton = this.drawOption(canvas.width/2,7,"CPU x CPU",
+                    global.cpu);
 
-                startButton.addEventListener("click",function() {
-                    combat.start();
+                let configButton = this.drawOption(canvas.width/2,9,"Config keys",
+                    global.keyConfig);
+            },
+
+            single: function() {
+                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+                this.chipSelect(p1data.chips,3,"P1");
+            },
+
+            multi: function() {
+                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+                let placeholder = canvas.node.appendChild(svgDraw("text"));
+                placeholder.style.fontSize = canvas.height/18;
+                placeholder.setAttribute("y",100);
+                placeholder.innerHTML = "Still under construction! (but it does work, somewhat)"
+            },
+
+            cpu: function() {
+                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+            },
+
+            configScreen: function() {
+                let back = this.drawOption(canvas.width/2,1,"Return",global.start);
+                let p1config = this.drawOption(canvas.width/6,3,"Config P1 Keys",() => {
+                    this.keyConfig("p1");
                 });
-            }
+                let p2config = this.drawOption(3.5*canvas.width/6,3,"Config P2 Keys",() => {
+                    this.keyConfig("p2");
+                });
+            },
+
+            keyConfig: function(player) {
+                // Rather crude function; I wanted to avoid using for() because
+                // a tiny mistake could overload my computer and make me wait for
+                // minutes until I can use it again
+                const reldata = (player==="p1" ? p1data : p2data)
+                const positions = [
+                    "top",
+                    "top-middle",
+                    "middle",
+                    "bottom-middle",
+                    "bottom",
+                ];
+                let i = 0;
+                let inputHere = this.drawOption(canvas.width/2,5);
+                lunar.addClass(inputHere,"inputDialog")
+                let currentKey = function() {
+                    if(i < 5) {
+                        inputHere.innerHTML = `Key for ${positions[i]} chip`;
+                        canvas.node.onkeydown = function(k) {
+                            console.log("pressed: "+k.keyCode);
+                            reldata.keys[i] = k.keyCode;
+                            i++;
+                            currentKey();
+                        }
+                    }
+
+                    else {
+                        i = 0;
+                        canvas.node.removeChild(canvas.node.getElementsByClassName("inputDialog")[0]);
+                        canvas.node.onkeypress = null;
+                    };
+                };
+                currentKey();
+
+            },
+
+            drawOption: function(x,yFraction,text,e) {
+                let button = canvas.node.appendChild(svgDraw("text"));
+                button.style.fontSize = canvas.height/12;
+                button.style.fill = "black";
+                button.setAttribute("x",x);
+                button.setAttribute("y",canvas.height/12*yFraction)
+                button.innerHTML = text;
+                if(e) {
+                    button.addEventListener("click",e)
+                }
+                return button;
+            },
+
+            chipSelect: function(chips,yFraction,p) {
+                let pick = 0;
+                this.drawOption(canvas.width/6,yFraction,"Choose your deck");
+                chipWheel.forEach(function(chip,i) { // Representing your options
+                    let rect = canvas.node.appendChild(svgDraw("rect"));
+                    rect.setAttribute("x",canvas.width/12*(i+2));
+                    rect.setAttribute("y",canvas.height/12*(yFraction+1));
+                    rect.style.fill = chip.color;
+                    rect.style.height = 25;
+                    rect.style.width = 25;
+                    rect.addEventListener("click",function() {
+                        console.log(p+" "+pick);
+                        p1data.chips[pick] = chip;
+                        canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
+                            chip.color;
+                    })
+                });
+                chips.forEach(function(chip,i) { // Representing the deck
+                    let rect = canvas.node.appendChild(svgDraw("rect"));
+                    rect.setAttribute("x",canvas.width/6);
+                    rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
+                    rect.style.fill = chip.color;
+                    rect.style.height = 40;
+                    rect.style.width = 40;
+                    lunar.addClass(rect,p+" "+i)
+                    rect.addEventListener("click",function() {
+                        pick = i;
+                    })
+                })
+            },
+
         },
 
         combat: {
@@ -145,7 +247,7 @@ function gameGraphics() {
                     player.X + chipsize : player.X);
                 shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
-                shot.style.stroke = 
+                shot.style.stroke =
                 shot.style.fill = shots[chipType.shot].color;
                 lunar.addClass(shot,"shot "+chipType.shot);
 

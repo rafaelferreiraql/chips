@@ -7,6 +7,59 @@ function gameEngine() {
             canvas = gameCanvas;
             global = Game.Engine.global;
 
+            // Types of shots
+            shots = {
+                "fire": {
+                    color: "red",
+                    dmg: 100,
+                    weak: ["water","light"],
+                },
+                "ice": {
+                    color: "lightblue",
+                    dmg: 100,
+                    weak: ["fire","light"],
+                },
+                "water": {
+                    color: "blue",
+                    dmg: 100,
+                    weak: ["ice","light"],
+                },
+                "shadow": {
+                    color:"#444",
+                    dmg: 150,
+                    weak: ["fire","water","ice","light"],
+                },
+                "light": {
+                    color:"lightgrey",
+                    dmg: 65,
+                    weak: [],
+                }
+            }
+
+            // Types of chips
+            types = {
+                "fire": {
+                    color: "red",
+                    shot: "fire",
+                },
+                "ice": {
+                    color:"lightblue",
+                    shot: "ice",
+                },
+                "water": {
+                    color:"blue",
+                    shot: "water",
+                },
+                "shadow": {
+                    color:"#444",
+                    shot: "shadow",
+                },
+                "light": {
+                    color:"lightgrey",
+                    shot: "light",
+                }
+            }
+
             chipWheel = [types.water,types.ice,types.fire,types.light,types.shadow];
 
             // Placeholder. It'll be eventually chosen in the menu.
@@ -19,6 +72,7 @@ function gameEngine() {
                 //X: "15%",
                 left: true,
                 chips: p1chips,
+                keys: ["49","50","51","52","53"],
             }
 
             p2data = {
@@ -27,7 +81,7 @@ function gameEngine() {
                 //X: "85%",
                 left: false,
                 chips: p2chips,
-                ai: BasicAIPlus,
+                keys: ["35","40","34","37","12"],
             }
             global.start();
             //combat.start(); //Left this one here for debugging
@@ -37,6 +91,32 @@ function gameEngine() {
             start: function() {
                 canvas.node.innerHTML = "";
                 Graphics.global.start();
+            },
+
+            singlePlayer: function() {
+                p2data.ai = BasicAIPlus;
+                combat.data.battle = "single";
+                canvas.node.innerHTML = "";
+                Graphics.global.single();
+            },
+
+            multiPlayer: function() {
+                combat.data.battle = "multi";
+                canvas.node.innerHTML = "";
+                Graphics.global.multi();
+            },
+
+            cpu: function() {
+                p1data.ai = BasicAIPlus;
+                p2data.ai = BasicAIPlus;
+                combat.data.battle = "cpu";
+                canvas.node.innerHTML = "";
+                Graphics.global.cpu();
+            },
+
+            keyConfig: function() {
+                canvas.node.innerHTML = "";
+                Graphics.global.configScreen();
             }
 
         },
@@ -54,6 +134,11 @@ function gameEngine() {
 
                 combat.data.turn = 0;
 
+                canvas.node.onkeydown = function(k) {
+                    let keys = [P1.keycodes,P2.keycodes];
+                    console.log(k.keyCode);
+                }
+
                 Graphics.combat.start();
             },
 
@@ -65,7 +150,8 @@ function gameEngine() {
 
                 // Duel continues
                 else {
-                    P2.AI.select();
+                    if(P1.AI) P1.AI.select();
+                    if(P2.AI) P2.AI.select();
 
                     combat.data.turn += 1;
                     if(combat.data.turn%5 === 0) {
@@ -78,7 +164,6 @@ function gameEngine() {
 
                     Graphics.combat.newTurnPH();
                 }
-
 
             },
 
@@ -104,7 +189,9 @@ function gameEngine() {
             },
 
             select: function(sel,player) {
-                //remember, selection here means the ID, not the position!
+                // remember, selection here means the ID, not the position!
+                // In hindsight, this might be the stupidest idea I've had.
+                // Might change this later
                 player.updateSelection(sel);
             },
 
