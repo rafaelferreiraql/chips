@@ -191,7 +191,7 @@ function gameEngine() {
             select: function(sel,player) {
                 // remember, selection here means the ID, not the position!
                 // In hindsight, this might be the stupidest idea I've had.
-                // Might change this later
+                // Might change this NOW!
                 player.updateSelection(sel);
             },
 

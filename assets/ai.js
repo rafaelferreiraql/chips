@@ -103,12 +103,13 @@ class BasicAI extends AI {
 
             let outcome = 0;
 
-            // Don't forget, index is equivalent to the chip's ID (albeit minus 1)
-            if(me.chips[index].pos < 3) {
+            // Index is the chip's position (not minus 1 since range() starts from 0)
+            // It was previously the ID but I learned from my mistakes.
+            if(index < 3) {
                 let chip1 = me.chips[index];
-                let chip2 = me.chips.find(chip => chip.pos === me.chips[index].pos+1)
-                let opp1 = enemy.chips.find(opp => opp.pos === me.chips[index].pos+1)
-                let opp2 = enemy.chips.find(opp => opp.pos === me.chips[index].pos)
+                let chip2 = me.chips[index+1];
+                let opp1 = enemy.chips[index+1];
+                let opp2 = enemy.chips[index];
 
                 // Pasted from compareShots(). Will compare shots
                 // between just the chips affected by the switch.
@@ -131,9 +132,9 @@ class BasicAI extends AI {
 
             else if(me.chips[index].pos > 3) {
                 let chip1 = me.chips[index];
-                let chip2 = me.chips.find(chip => chip.pos === me.chips[index].pos-1)
-                let opp1 = enemy.chips.find(opp => opp.pos === me.chips[index].pos-1)
-                let opp2 = enemy.chips.find(opp => opp.pos === me.chips[index].pos)
+                let chip2 = me.chips[index-1];
+                let opp1 = enemy.chips[index-1];
+                let opp2 = enemy.chips[index];
 
                 if(!combat.willBreak(chip1,opp1)) {
                     outcome += chip1.shot.dmg;

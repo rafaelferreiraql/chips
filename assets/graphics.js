@@ -139,6 +139,7 @@ function gameGraphics() {
                 P2.draw();
                 P1.drawScore();
                 P2.drawScore();
+                this.debug(); // For various debug purposes
                 Graphics.combat.newTurnPH();
             },
 
@@ -164,11 +165,13 @@ function gameGraphics() {
                     rect.style.y = self.data.positions[index];
                     rect.style.fill = player.chips[index].type.color;
 
+                    // Note: the class will refer always to the ID.
+                    // When fetching the chip on the DOM, remember it's the ID,
+                    // not the position!
                     lunar.addClass(rect, `chip ${index+1} ${player.tag}`);
 
-                    // Imprints the actual index of the chip, since it's equal
-                    // to the position when this below is assigned.
-                    rect.onclick = function() {combat.select(index+1,player)}
+                    rect.onclick = function() {combat.select(
+                        player.chips.findIndex(chip=>chip.id === index+1)+1,player)}
 
                     onResize(function() {
                         rect.style.x = (player.left ? player.setX() : player.setX()-dim);
@@ -238,7 +241,8 @@ function gameGraphics() {
 
             shoot: function(player,half=false) {
                 let sel = player.selected;
-                let chip = canvas.node.getElementsByClassName(`${sel} ${player.tag}`)[0];
+                let selToID = player.chips[sel-1].id;
+                let chip = canvas.node.getElementsByClassName(`${selToID} ${player.tag}`)[0];
                 let shot = canvas.node.appendChild(svgDraw("circle"));
                 let chipsize = this.data.chipDim;
                 let chipType = player.chips[sel-1].type;
@@ -247,7 +251,7 @@ function gameGraphics() {
                     player.X + chipsize : player.X);
                 shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
-                shot.style.stroke =
+                shot.style.strokeWidth = 1;
                 shot.style.fill = shots[chipType.shot].color;
                 lunar.addClass(shot,"shot "+chipType.shot);
 
@@ -308,7 +312,11 @@ function gameGraphics() {
                         chipdata1.pos = index2;
                         chipdata2.pos = index1;
 
-                        combat.select(chipdata2.id,player);
+                        let [backup1, backup2] = [chipdata1,chipdata2];
+                        player.chips[index2-1] = chipdata1;
+                        player.chips[index1-1] = chipdata2;
+
+                        combat.select(index1,player);
                     }
 
                     else { // Frame update happens
@@ -344,7 +352,15 @@ function gameGraphics() {
                 endText.style.fontSize = 50;
                 endText.setAttribute("y",50);
                 endText.addEventListener("click",combat.start);
+            },
 
+            debug: function() {
+                let debug = canvas.node.appendChild(svgDraw("rect"));
+                debug.style.width = 50;
+                debug.style.height = 50;
+                debug.onclick = function() {
+                    console.log(P2.chips);
+                }
             }
         },
     } // Close Return

@@ -36,8 +36,8 @@ class Player {
     }
 
     updateSelection(select) {
-        this.selected = select; // Refers to the chip ID, not the position!
-        this.selectedChip = this.chips[this.selected-1];
+        this.selected = select; // Now refactoring to select by position!
+        this.selectedChip = this.chips[select-1];
     }
 
     draw() {
@@ -63,12 +63,12 @@ class Player {
         let index = this.chips[this.selected-1].pos;
         if(index < 3) {combat.switch(
             this.chips[this.selected-1],
-            this.chips.find(function(chip) {return chip.pos === index+1}),
+            this.chips[this.selected],
             this);
         }
         else if(index > 3) {combat.switch(
             this.chips[this.selected-1],
-            this.chips.find(function(chip) {return chip.pos === index-1}),
+            this.chips[this.selected-2],
             this);
         }
         else console.log("No Switch");
