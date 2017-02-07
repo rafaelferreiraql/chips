@@ -18,7 +18,7 @@ function gameGraphics() {
                 let cpuButton = this.drawOption(canvas.width/2,7,"CPU x CPU",
                     global.cpu);
 
-                let configButton = this.drawOption(canvas.width/2,9,"Config keys",
+                let configButton = this.drawOption(canvas.width/2,9,"Config keys (experimental!)",
                     global.keyConfig);
             },
 
@@ -150,7 +150,7 @@ function gameGraphics() {
                     // Worth reminding that combat.select(sel,player) will only do anything
                     // when "sel" is 1-5, so if it doesn't belong to player.keycodes,
                     // "sel" will be 0, thus nothing will happen, just as intended.
-                }
+                };
             },
 
             data: {
@@ -362,6 +362,7 @@ function gameGraphics() {
                 endText.style.fontSize = 50;
                 endText.setAttribute("y",50);
                 endText.addEventListener("click",combat.start);
+                canvas.node.onkeydown = null;
             },
 
             debug: function() {
