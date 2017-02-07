@@ -24,7 +24,7 @@ function gameGraphics() {
 
             single: function() {
                 let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
-                this.chipSelect(p1data.chips,3,"P1");
+                this.chipSelect(p1data.chips,1,3,"P1");
             },
 
             multi: function() {
@@ -32,7 +32,9 @@ function gameGraphics() {
                 let placeholder = canvas.node.appendChild(svgDraw("text"));
                 placeholder.style.fontSize = canvas.height/18;
                 placeholder.setAttribute("y",100);
-                placeholder.innerHTML = "Still under construction! (but it does work, somewhat)"
+
+                this.chipSelect(p1data.chips,1,3,"P1");
+                this.chipSelect(p2data.chips,6.5,3,"P2");
             },
 
             cpu: function() {
@@ -53,7 +55,7 @@ function gameGraphics() {
                 // Rather crude function; I wanted to avoid using for() because
                 // a tiny mistake could overload my computer and make me wait for
                 // minutes until I can use it again
-                const reldata = (player==="p1" ? p1data : p2data)
+                const reldata = (player === "p1" ? p1data : p2data)
                 const positions = [
                     "top",
                     "top-middle",
@@ -63,7 +65,7 @@ function gameGraphics() {
                 ];
                 let i = 0;
                 let inputHere = this.drawOption(canvas.width/2,5);
-                lunar.addClass(inputHere,"inputDialog")
+                lunar.addClass(inputHere,"inputDialog");
                 let currentKey = function() {
                     if(i < 5) {
                         inputHere.innerHTML = `Key for ${positions[i]} chip`;
@@ -78,7 +80,7 @@ function gameGraphics() {
                     else {
                         i = 0;
                         canvas.node.removeChild(canvas.node.getElementsByClassName("inputDialog")[0]);
-                        canvas.node.onkeypress = null;
+                        canvas.node.onkeydown = null;
                     };
                 };
                 currentKey();
@@ -98,26 +100,27 @@ function gameGraphics() {
                 return button;
             },
 
-            chipSelect: function(chips,yFraction,p) {
+            chipSelect: function(chips,xFraction,yFraction,p) {
                 let pick = 0;
-                this.drawOption(canvas.width/6,yFraction,"Choose your deck");
+                this.drawOption(xFraction*canvas.width/12,yFraction,`Choose your deck (${p})`);
                 chipWheel.forEach(function(chip,i) { // Representing your options
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",canvas.width/12*(i+2));
+                    rect.setAttribute("x",canvas.width/12*(i+xFraction));
                     rect.setAttribute("y",canvas.height/12*(yFraction+1));
                     rect.style.fill = chip.color;
                     rect.style.height = 25;
                     rect.style.width = 25;
                     rect.addEventListener("click",function() {
                         console.log(p+" "+pick);
-                        p1data.chips[pick] = chip;
+                        if(p==="P1") chips[pick] = chip;
+                        else chips[pick] = chip;
                         canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
                             chip.color;
                     })
                 });
                 chips.forEach(function(chip,i) { // Representing the deck
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",canvas.width/6);
+                    rect.setAttribute("x",xFraction*canvas.width/12);
                     rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
                     rect.style.fill = chip.color;
                     rect.style.height = 40;
@@ -141,6 +144,13 @@ function gameGraphics() {
                 P2.drawScore();
                 this.debug(); // For various debug purposes
                 Graphics.combat.newTurnPH();
+                canvas.node.onkeydown = function(k) {
+                    combat.select(P1.keycodes.indexOf(k.keyCode)+1,P1);
+                    combat.select(P2.keycodes.indexOf(k.keyCode)+1,P2);
+                    // Worth reminding that combat.select(sel,player) will only do anything
+                    // when "sel" is 1-5, so if it doesn't belong to player.keycodes,
+                    // "sel" will be 0, thus nothing will happen, just as intended.
+                }
             },
 
             data: {
@@ -359,7 +369,7 @@ function gameGraphics() {
                 debug.style.width = 50;
                 debug.style.height = 50;
                 debug.onclick = function() {
-                    console.log(P2.chips);
+                    console.log(P1.chips);
                 }
             }
         },

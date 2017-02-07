@@ -36,7 +36,7 @@ class Player {
     }
 
     updateSelection(select) {
-        this.selected = select; // Now refactoring to select by position!
+        this.selected = select; // Now refactoring to select by position! (1 to 5)
         this.selectedChip = this.chips[select-1];
     }
 

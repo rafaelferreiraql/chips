@@ -62,7 +62,7 @@ function gameEngine() {
 
             chipWheel = [types.water,types.ice,types.fire,types.light,types.shadow];
 
-            // Placeholder. It'll be eventually chosen in the menu.
+            // Previously a placeholder, now it's default.
             p1chips = range(5).map(() => chipWheel[Math.floor(Math.random()*5)]);
             p2chips = range(5).map(() => chipWheel[Math.floor(Math.random()*5)]);
 
@@ -189,10 +189,11 @@ function gameEngine() {
             },
 
             select: function(sel,player) {
-                // remember, selection here means the ID, not the position!
-                // In hindsight, this might be the stupidest idea I've had.
-                // Might change this NOW!
-                player.updateSelection(sel);
+                // "sel" is the position (from 1 to 5).
+                if(sel > 0 && sel < 6) {
+                    player.updateSelection(sel);
+                }
+                // Else, selection is not valid and nothing will happen.
             },
 
             switch: function(chip1,chip2,player) {
