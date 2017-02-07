@@ -110,13 +110,23 @@ function gameGraphics() {
                     rect.style.fill = chip.color;
                     rect.style.height = 25;
                     rect.style.width = 25;
-                    rect.addEventListener("click",function() {
-                        console.log(p+" "+pick);
-                        if(p==="P1") chips[pick] = chip;
-                        else chips[pick] = chip;
+
+                    let changeDeck = function() {
+                        chips[pick] = chip;
                         canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
                             chip.color;
-                    })
+                    }
+                    rect.addEventListener("click",changeDeck)
+                    canvas.node.addEventListener("keydown", function(k) {
+                        let data;
+                        if(p === "P1") {
+                            data = p1data;
+                        }
+                        else data = p2data;
+                        if (data.keys[i] == k.keyCode) {
+                            changeDeck();
+                        }
+                    });
                 });
                 chips.forEach(function(chip,i) { // Representing the deck
                     let rect = canvas.node.appendChild(svgDraw("rect"));
