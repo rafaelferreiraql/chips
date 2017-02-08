@@ -88,20 +88,26 @@ function gameEngine() {
         },
 
         global: {
+
+            data: {
+                
+            },
+
             start: function() {
                 canvas.node.innerHTML = "";
+                global.data.menu = "main";
                 Graphics.global.start();
             },
 
             singlePlayer: function() {
                 p2data.ai = BasicAIPlus;
-                combat.data.battle = "single";
+                global.data.menu = "single";
                 canvas.node.innerHTML = "";
                 Graphics.global.single();
             },
 
             multiPlayer: function() {
-                combat.data.battle = "multi";
+                global.data.menu = "multi";
                 canvas.node.innerHTML = "";
                 Graphics.global.multi();
             },
@@ -109,13 +115,14 @@ function gameEngine() {
             cpu: function() {
                 p1data.ai = BasicAIPlus;
                 p2data.ai = BasicAIPlus;
-                combat.data.battle = "cpu";
+                global.data.menu = "cpu";
                 canvas.node.innerHTML = "";
                 Graphics.global.cpu();
             },
 
             keyConfig: function() {
                 canvas.node.innerHTML = "";
+                global.data.menu = "config";
                 Graphics.global.configScreen();
             }
 

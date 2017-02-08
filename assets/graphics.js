@@ -113,8 +113,10 @@ function gameGraphics() {
 
                     let changeDeck = function() {
                         chips[pick] = chip;
-                        canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
-                            chip.color;
+                        if(global.data.menu !== "multi") {
+                            canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
+                                chip.color;
+                        }
                     }
                     rect.addEventListener("click",changeDeck)
                     canvas.node.addEventListener("keydown", function(k) {
@@ -132,7 +134,7 @@ function gameGraphics() {
                     let rect = canvas.node.appendChild(svgDraw("rect"));
                     rect.setAttribute("x",xFraction*canvas.width/12);
                     rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
-                    rect.style.fill = chip.color;
+                    if(global.data.menu !== "multi") rect.style.fill = chip.color;
                     rect.style.height = 40;
                     rect.style.width = 40;
                     lunar.addClass(rect,p+" "+i)
