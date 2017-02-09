@@ -1,3 +1,4 @@
+// Backup for graphic using stock SVG graphics like <rect>
 function gameGraphics() {
 
     let canvas = gameCanvas;
@@ -154,7 +155,7 @@ function gameGraphics() {
                 P2.draw();
                 P1.drawScore();
                 P2.drawScore();
-                //this.debug(); // For various debug purposes
+                this.debug(); // For various debug purposes
                 Graphics.combat.newTurnPH();
                 canvas.node.onkeydown = function(k) {
                     combat.select(P1.keycodes.indexOf(k.keyCode)+1,P1);
@@ -179,15 +180,13 @@ function gameGraphics() {
                 });
                 this.data.grid.forEach(function(pos,index) {
                     let dim = self.data.chipDim;
-                    let rect = canvas.node.appendChild(svgDraw("use"));
-                    // The assignment below MUST be different if we introduce chips
-                    // whose name is different from its respective shots.
-                    let chipname = player.chips[index].type.shot;
-                    rect.setAttribute("href","#chip"+chipname);
-                    rect.setAttribute("transform","scale(0.1)");
-                    // Mutliplying by 10 because of the transform!
-                    rect.setAttribute("x",(player.left ? player.X : player.X-dim)*10);
-                    rect.setAttribute("y",self.data.positions[index]*10);
+                    let rect = canvas.node.appendChild(svgDraw("rect"));
+
+                    rect.style.height = dim;
+                    rect.style.width = dim;
+                    rect.style.x = (player.left ? player.X : player.X-dim);
+                    rect.style.y = self.data.positions[index];
+                    rect.style.fill = player.chips[index].type.color;
 
                     // Note: the class will refer always to the ID.
                     // When fetching the chip on the DOM, remember it's the ID,
@@ -273,8 +272,7 @@ function gameGraphics() {
 
                 shot.style.cx = (player.left ?
                     player.X + chipsize : player.X);
-                // chipY divided by 10 because of transform, again
-                shot.style.cy = parseInt(chip.getAttribute("y")/10)+chipsize/2;
+                shot.style.cy = parseInt(chip.style.y)+chipsize/2;
                 shot.style.r = 10;
                 shot.style.strokeWidth = 1;
                 shot.style.fill = shots[chipType.shot].color;
@@ -319,20 +317,20 @@ function gameGraphics() {
                 const data = this.data;
                 const chip1 = canvas.node.getElementsByClassName(`${chipdata1.id} ${player.tag}`)[0];
                 const chip2 = canvas.node.getElementsByClassName(`${chipdata2.id} ${player.tag}`)[0];
-                let position1 = data.positions[index1-1]*10;
-                let position2 = data.positions[index2-1]*10;
+                let position1 = data.positions[index1-1];
+                let position2 = data.positions[index2-1];
 
-                const step = 50;
+                const step = 5;
                 let animation = setInterval(frame,5);
 
                 function frame() {
-                    if(Math.abs(position1 - data.positions[index2-1]*10) < step+1) {
+                    if(Math.abs(position1 - data.positions[index2-1]) < step+1) {
                         // Stopping the updates
                         clearInterval(animation);
 
                         // Correcting the positions
-                        chip1.setAttribute("y",data.positions[index2-1]*10);
-                        chip2.setAttribute("y",data.positions[index1-1]*10);
+                        chip1.style.y = data.positions[index2-1];
+                        chip2.style.y = data.positions[index1-1];
 
                         chipdata1.pos = index2;
                         chipdata2.pos = index1;
@@ -354,11 +352,8 @@ function gameGraphics() {
                             position2 -= step;
                         }
 
-                        chip1.setAttribute("y",position1);
-                        chip2.setAttribute("y",position2);
-
-                        //chip1.style.y = position1;
-                        //chip2.style.y = position2;
+                        chip1.style.y = position1;
+                        chip2.style.y = position2;
                     }
                 }
             },
