@@ -393,8 +393,9 @@ function gameGraphics() {
                 function frame() {
                     if(Math.abs(position - posFinal) < 10) {
                         clearInterval(animation);
+                        if (half) self.collide([posFinal,shot.style.cy],player.left)
                         self.eraseShot(shot,type);
-                        self.score(player)
+                        self.score(player);
                     }
                     else {
                         position += frameMov;
@@ -405,6 +406,46 @@ function gameGraphics() {
 
             eraseShot: function(shot,type) {
                 canvas.node.getElementsByClassName(type)[0].remove();
+            },
+
+            collide: function(coords,left,color) {
+                let burst = canvas.node.appendChild(svgDraw("use"));
+
+                // Copied straight from the original file.
+                let dimensions = {width: 31.865231, height: 46.86792}
+                burst.setAttribute("width",dimensions.width);
+                burst.setAttribute("height",dimensions.height);
+
+                burst.setAttribute("x",coords[0]);
+                burst.setAttribute("y",coords[1]);
+                burst.setAttribute("href","#shotburst");
+
+                // Troublesome because the gradient is already ID'ed before on the code
+                Array.from(burst.getElementsByTagName("stop")).forEach(
+                    stop => {
+                        stop.setAttribute("stop-color","#5aa");
+                    }
+                );
+                // Troublesome because ???
+                Array.from(burst.getElementsByTagName("path")).forEach(
+                    path => {
+                        path.setAttribute("fill","#48a");
+                    }
+                );
+                lunar.addClass(burst,"burst");
+
+                if(left) {
+                    // Horizontal flip and retranslating because of mirroring
+                    let x = 2*(burst.getBBox().x + burst.getBBox().width);
+                    burst.setAttribute("transform",`scale(-1,1) translate(${-x},0)`);
+                    console.log(x);
+                    console.log(burst.getBBox().x);
+                }
+
+                window.setTimeout(function() {
+                    Array.from(canvas.node.getElementsByClassName("burst")).forEach(
+                    (el) => el.remove())
+                },2000);
             },
 
             switch: function(chipdata1,chipdata2,player) {
