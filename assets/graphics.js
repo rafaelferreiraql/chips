@@ -9,22 +9,22 @@ function gameGraphics() {
         global: {
 
             start: function() {
-                let singleButton = this.drawOption(canvas.width/2,3,"Single Player",
+                let singleButton = this.drawOption(canvas.width/2,5,"Single Player",
                     global.singlePlayer);
 
-                let multiButton = this.drawOption(canvas.width/2,5,"Multi Player",
+                let multiButton = this.drawOption(canvas.width/2,7,"Multi Player",
                     global.multiPlayer);
 
-                let cpuButton = this.drawOption(canvas.width/2,7,"CPU x CPU",
+                let cpuButton = this.drawOption(canvas.width/2,9,"CPU x CPU",
                     global.cpu);
 
-                let configButton = this.drawOption(canvas.width/2,9,"Config keys (experimental!)",
+                let configButton = this.drawOption(canvas.width/2,11,"Config keys (experimental!)",
                     global.keyConfig);
             },
 
             single: function() {
                 let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
-                this.chipSelect(p1data.chips,1,3,"P1");
+                this.chipSelect(p1data.chips,"left",3,"P1");
             },
 
             multi: function() {
@@ -33,8 +33,8 @@ function gameGraphics() {
                 placeholder.style.fontSize = canvas.height/18;
                 placeholder.setAttribute("y",100);
 
-                this.chipSelect(p1data.chips,1,3,"P1");
-                this.chipSelect(p2data.chips,6.5,3,"P2");
+                this.chipSelect(p1data.chips,"left",3,"P1");
+                this.chipSelect(p2data.chips,"right",3,"P2");
             },
 
             cpu: function() {
@@ -64,7 +64,7 @@ function gameGraphics() {
                     "bottom",
                 ];
                 let i = 0;
-                let inputHere = this.drawOption(canvas.width/2,5);
+                let inputHere = this.drawText(canvas.width/2,5);
                 lunar.addClass(inputHere,"inputDialog");
                 let currentKey = function() {
                     if(i < 5) {
@@ -88,24 +88,93 @@ function gameGraphics() {
             },
 
             drawOption: function(x,yFraction,text,e) {
-                let button = canvas.node.appendChild(svgDraw("text"));
-                button.style.fontSize = canvas.height/12;
-                button.style.fill = "black";
-                button.setAttribute("x",x);
-                button.setAttribute("y",canvas.height/12*yFraction)
-                button.innerHTML = text;
-                if(e) {
-                    button.addEventListener("click",e)
+                const pad = 10; // Padding
+
+                let box = canvas.node.appendChild(svgDraw("rect"));
+                let svgText = this.drawText(x,yFraction,text,e,pad*2);
+
+                const round = 10; // Rounded corner radius
+
+                // Text y points to the bottom, so I use getBBox().y instead
+                box.style.x = svgText.getAttribute("x") - pad;
+                box.style.y = svgText.getBBox().y - pad;
+                box.style.width = svgText.getBBox().width + pad*2;
+                box.style.height = svgText.getBBox().height + pad*2;
+                box.style.opacity = 1;
+                box.style.rx, box.style.ry = round;
+                box.style.strokeWidth = 2;
+                box.style.transition = "all 0.1s linear";
+                function boxColors() { // For reuse in mouseout event
+                    box.style.fill = "grey";
+                    box.style.stroke = "blue";
                 }
+                boxColors();
+                box.addEventListener("mouseover",() => {
+                    box.style.fill = "blue";
+                    box.style.stroke = "green"
+                });
+                box.addEventListener("mouseout",boxColors);
+
+                if(e) {
+                    box.addEventListener("click",e)
+                }
+
+                // Additional text styling
+                svgText.style.fill = "white";
+                svgText.setAttribute("pointer-events","none");
+
+                // Classing elements
+                lunar.addClass(box,"menuOption box");
+                lunar.addClass(svgText,"menuOption");
+
+                onResize(function() {
+                    box.style.x = svgText.getAttribute("x") - pad;
+                })
+
+                return box;
+            },
+
+            drawText: function(x,yFraction,text,e,pad=0) {
+                let button = canvas.node.appendChild(svgDraw("text"));
+                button.style.fontSize = canvas.height/16;
+                button.style.fill = "black";
+                button.style.fontFamily = "menuFont";
+                button.innerHTML = text;
+
+                function set_X() {
+                    if(typeof x === "string") {
+                        if(x === "left") x = pad;
+                        else if (x === "right") x = canvas.width - button.getBBox().width - pad;
+                        button.setAttribute("x",x);
+                    }
+                    else {
+                        button.setAttribute("x",x - button.getBBox().width/2);
+                    }
+                }
+                set_X();
+
+                button.setAttribute("y",canvas.height/12*yFraction);
+                onResize(function() {
+                    set_X();
+                });
+                lunar.addClass(button,"text");
+
                 return button;
             },
 
-            chipSelect: function(chips,xFraction,yFraction,p) {
+            chipSelect: function(chips,textX,yFraction,p) {
+                let padding = 20;
                 let pick = 0;
-                this.drawOption(xFraction*canvas.width/12,yFraction,`Choose your deck (${p})`);
+                let dialog =
+                    this.drawText(
+                        (typeof textX === "string" ? textX : textX*canvas.width/12),
+                        yFraction,`Choose your deck (${p})`,null,padding);
+
+                if (typeof textX === "string") textX = dialog.getBBox().x;
+
                 chipWheel.forEach(function(chip,i) { // Representing your options
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",canvas.width/12*(i+xFraction));
+                    rect.setAttribute("x",canvas.width/18*(i)+textX);
                     rect.setAttribute("y",canvas.height/12*(yFraction+1));
                     rect.style.fill = chip.color;
                     rect.style.height = 25;
@@ -132,7 +201,7 @@ function gameGraphics() {
                 });
                 chips.forEach(function(chip,i) { // Representing the deck
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",xFraction*canvas.width/12);
+                    rect.setAttribute("x",textX);
                     rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
                     if(global.data.menu !== "multi") rect.style.fill = chip.color;
                     rect.style.height = 40;
@@ -140,8 +209,8 @@ function gameGraphics() {
                     lunar.addClass(rect,p+" "+i)
                     rect.addEventListener("click",function() {
                         pick = i;
-                    })
-                })
+                    });
+                });
             },
 
         },
@@ -167,8 +236,11 @@ function gameGraphics() {
 
             data: {
                 chipDim: 50,
+                chipScale: 10,
+                gridPad: canvas.height/12,
                 grid: range(1,6).map((v,_,array) => {
-                    return (canvas.height/(array.length+1))*v;
+                    let gridPad = canvas.height/12;
+                    return (gridPad+(canvas.height-2*gridPad)/(array.length+1)*v);
                 }),
             },
 
@@ -178,16 +250,17 @@ function gameGraphics() {
                     return pos - self.data.chipDim/2;
                 });
                 this.data.grid.forEach(function(pos,index) {
+                    let scaleFactor = self.data.chipScale;
                     let dim = self.data.chipDim;
                     let rect = canvas.node.appendChild(svgDraw("use"));
                     // The assignment below MUST be different if we introduce chips
                     // whose name is different from its respective shots.
                     let chipname = player.chips[index].type.shot;
                     rect.setAttribute("href","#chip"+chipname);
-                    rect.setAttribute("transform","scale(0.1)");
+                    rect.setAttribute("transform",`scale(${1/scaleFactor})`);
                     // Mutliplying by 10 because of the transform!
-                    rect.setAttribute("x",(player.left ? player.X : player.X-dim)*10);
-                    rect.setAttribute("y",self.data.positions[index]*10);
+                    rect.setAttribute("x",(player.left ? player.X : player.X-dim)*scaleFactor);
+                    rect.setAttribute("y",self.data.positions[index]*scaleFactor);
 
                     // Note: the class will refer always to the ID.
                     // When fetching the chip on the DOM, remember it's the ID,
@@ -198,14 +271,16 @@ function gameGraphics() {
                         player.chips.findIndex(chip=>chip.id === index+1)+1,player)}
 
                     onResize(function() {
-                        rect.style.x = (player.left ? player.setX() : player.setX()-dim);
+                        player.X = player.setX();
+                        rect.setAttribute("x",(player.left ? player.X : player.X-dim)*10);
                     })
                 })
             },
 
             score: function(player) {
+                let score;
                 if(!canvas.node.getElementsByClassName(player.tag+" score")[0]) {
-                    let score = canvas.node.appendChild(svgDraw("text"));
+                    score = canvas.node.appendChild(svgDraw("text"));
                     let size = 50;
                     score.setAttribute("x",
                         player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
@@ -218,19 +293,20 @@ function gameGraphics() {
                 }
                 else {
                     console.log("Já criou!");
-                    let score = canvas.node.getElementsByClassName(player.tag+" score")[0];
+                    score = canvas.node.getElementsByClassName(player.tag+" score")[0];
                     score.innerHTML = player.score.value;
                 }
 
                 onResize(function() {
-                    score.style.x = (player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
-                })
+                    let pad = 100;
+                    score.setAttribute("x",player.left ? canvas.width/2 - pad : canvas.width/2 + pad)
+                });
 
             },
 
             newTurnPH: function() {
-                if(canvas.node.getElementsByClassName("nextTurn")[0]) {
-                    let turner = canvas.node.getElementsByClassName("nextTurn")[0];
+                let turner = canvas.node.getElementsByClassName("nextTurn")[0]
+                if(turner) { // Turn button is already rendered
                     let text;
                     if(combat.data.turn === combat.data.lastTurn) text = "End";
                     else if((combat.data.turn + 1) % 5 !== 0) text = "Shoot!";
@@ -239,9 +315,8 @@ function gameGraphics() {
                     turner.innerHTML = text;
                 }
 
-                else {
-                    // Botão verde debug para mudar a rodada manualmente
-                    let turner = canvas.node.appendChild(svgDraw("text"));
+                else { // Turn button is not rendered
+                    turner = canvas.node.appendChild(svgDraw("text"));
                     lunar.addClass(turner,"nextTurn");
 
                     turner.innerHTML = "Shoot!";
@@ -252,15 +327,14 @@ function gameGraphics() {
                     turner.setAttribute("height",30);
                     turner.setAttribute("width",30);
                     turner.setAttribute("fill","green");
-                    turner.setAttribute("x",canvas.width/2);
+                    turner.setAttribute("x",canvas.width/2 - turner.getBBox().width/2);
                     turner.setAttribute("y",40);
                     turner.addEventListener("click",combat.newTurn);
                 }
-            },
 
-            resize: function() {
-                console.log("escutei");
-                // Reset all X and Y coordinates of... everything?
+                onResize(function() {
+                    turner.setAttribute("x",canvas.width/2 - turner.getBBox().width/2);
+                })
             },
 
             shoot: function(player,half=false) {

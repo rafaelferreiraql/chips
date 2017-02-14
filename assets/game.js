@@ -30,4 +30,6 @@ let Game = function() {
     } // Close Return
 }();
 
-Game.Engine.init();
+new FontFaceObserver('MenuFont').load().then(function() {
+    Game.Engine.init();
+});
