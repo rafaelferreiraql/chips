@@ -130,6 +130,8 @@ if (!Array.prototype.includes) {
 function onResize(callback) {
     window.addEventListener("resize",callback);
 }
+// Use it whenever the DOM is cleared
+onResize.clear = function() {console.log("clear!");}
 
 // Font Face Observer by Bram Stein (4.04 kB)
 // API for firing events when font is loaded

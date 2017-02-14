@@ -3,32 +3,33 @@ function gameGraphics() {
     let canvas = gameCanvas;
     // Already defined in Engine.init(), but Graphics.combat.data needs this
     // since it's not called. Might try to populate it on Engine.init().
+    let mid = () => {return canvas.width/2;};
 
     return {
 
         global: {
 
             start: function() {
-                let singleButton = this.drawOption(canvas.width/2,5,"Single Player",
+                let singleButton = this.drawOption(mid,5,"Single Player",
                     global.singlePlayer);
 
-                let multiButton = this.drawOption(canvas.width/2,7,"Multi Player",
+                let multiButton = this.drawOption(mid,7,"Multi Player",
                     global.multiPlayer);
 
-                let cpuButton = this.drawOption(canvas.width/2,9,"CPU x CPU",
+                let cpuButton = this.drawOption(mid,9,"CPU x CPU",
                     global.cpu);
 
-                let configButton = this.drawOption(canvas.width/2,11,"Config keys (experimental!)",
+                let configButton = this.drawOption(mid,11,"Config keys (experimental!)",
                     global.keyConfig);
             },
 
             single: function() {
-                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+                let start = this.drawOption(mid,1,"Start!",combat.start);
                 this.chipSelect(p1data.chips,"left",3,"P1");
             },
 
             multi: function() {
-                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+                let start = this.drawOption(mid,1,"Start!",combat.start);
                 let placeholder = canvas.node.appendChild(svgDraw("text"));
                 placeholder.style.fontSize = canvas.height/18;
                 placeholder.setAttribute("y",100);
@@ -38,15 +39,18 @@ function gameGraphics() {
             },
 
             cpu: function() {
-                let start = this.drawOption(canvas.width/2,1,"Start!",combat.start);
+                let start = this.drawOption(mid,1,"Start!",combat.start);
+
+                this.chipSelect(p1data.chips,"left",3,"P1");
+                this.chipSelect(p2data.chips,"right",3,"P2");
             },
 
             configScreen: function() {
-                let back = this.drawOption(canvas.width/2,1,"Return",global.start);
-                let p1config = this.drawOption(canvas.width/6,3,"Config P1 Keys",() => {
+                let back = this.drawOption(mid,1,"Return",global.start);
+                let p1config = this.drawOption("left",3,"Config P1 Keys",() => {
                     this.keyConfig("p1");
                 });
-                let p2config = this.drawOption(3.5*canvas.width/6,3,"Config P2 Keys",() => {
+                let p2config = this.drawOption("right",3,"Config P2 Keys",() => {
                     this.keyConfig("p2");
                 });
             },
@@ -64,7 +68,7 @@ function gameGraphics() {
                     "bottom",
                 ];
                 let i = 0;
-                let inputHere = this.drawText(canvas.width/2,5);
+                let inputHere = this.drawText(mid,5);
                 lunar.addClass(inputHere,"inputDialog");
                 let currentKey = function() {
                     if(i < 5) {
@@ -87,11 +91,11 @@ function gameGraphics() {
 
             },
 
-            drawOption: function(x,yFraction,text,e) {
+            drawOption: function(xFunction,yFraction,text,e) {
                 const pad = 10; // Padding
 
                 let box = canvas.node.appendChild(svgDraw("rect"));
-                let svgText = this.drawText(x,yFraction,text,e,pad*2);
+                let svgText = this.drawText(xFunction,yFraction,text,e,pad*2);
 
                 const round = 10; // Rounded corner radius
 
@@ -103,7 +107,7 @@ function gameGraphics() {
                 box.style.opacity = 1;
                 box.style.rx, box.style.ry = round;
                 box.style.strokeWidth = 2;
-                box.style.transition = "all 0.1s linear";
+                box.style.transition = "fill stroke 0.1s linear";
                 function boxColors() { // For reuse in mouseout event
                     box.style.fill = "grey";
                     box.style.stroke = "blue";
@@ -134,7 +138,7 @@ function gameGraphics() {
                 return box;
             },
 
-            drawText: function(x,yFraction,text,e,pad=0) {
+            drawText: function(xFunction,yFraction,text,e,pad=0) {
                 let button = canvas.node.appendChild(svgDraw("text"));
                 button.style.fontSize = canvas.height/16;
                 button.style.fill = "black";
@@ -142,13 +146,18 @@ function gameGraphics() {
                 button.innerHTML = text;
 
                 function set_X() {
-                    if(typeof x === "string") {
-                        if(x === "left") x = pad;
-                        else if (x === "right") x = canvas.width - button.getBBox().width - pad;
-                        button.setAttribute("x",x);
+                    if(typeof xFunction === "string") {
+                        let original = xFunction;
+                        if(xFunction === "left") xFunction = pad;
+                        else if (xFunction === "right") xFunction = canvas.width - button.getBBox().width - pad;
+                        button.setAttribute("x",xFunction);
+                        // The "original" shenanigans is necessary for the function
+                        // to receive xFunction always as it should be when it's
+                        // invoked by a screen size change.
+                        xFunction = original;
                     }
                     else {
-                        button.setAttribute("x",x - button.getBBox().width/2);
+                        button.setAttribute("x",xFunction() - button.getBBox().width/2);
                     }
                 }
                 set_X();
@@ -163,18 +172,25 @@ function gameGraphics() {
             },
 
             chipSelect: function(chips,textX,yFraction,p) {
+                let original = textX;
                 let padding = 20;
                 let pick = 0;
                 let dialog =
                     this.drawText(
-                        (typeof textX === "string" ? textX : textX*canvas.width/12),
+                        textX,
                         yFraction,`Choose your deck (${p})`,null,padding);
 
-                if (typeof textX === "string") textX = dialog.getBBox().x;
+                let textWidth = dialog.getBBox().width;
+
+                // De-centering the chips
+                if (typeof textX === "string") textX = () => dialog.getBBox().x;
+                else {
+                    textX = () => original() - textWidth/2;
+                }
 
                 chipWheel.forEach(function(chip,i) { // Representing your options
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",canvas.width/18*(i)+textX);
+                    rect.setAttribute("x",i*textWidth/5+textX());
                     rect.setAttribute("y",canvas.height/12*(yFraction+1));
                     rect.style.fill = chip.color;
                     rect.style.height = 25;
@@ -198,10 +214,13 @@ function gameGraphics() {
                             changeDeck();
                         }
                     });
+                    onResize(function() {
+                        rect.setAttribute("x",i*textWidth/5+textX());
+                    })
                 });
                 chips.forEach(function(chip,i) { // Representing the deck
                     let rect = canvas.node.appendChild(svgDraw("rect"));
-                    rect.setAttribute("x",textX);
+                    rect.setAttribute("x",textX());
                     rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
                     if(global.data.menu !== "multi") rect.style.fill = chip.color;
                     rect.style.height = 40;
@@ -210,6 +229,9 @@ function gameGraphics() {
                     rect.addEventListener("click",function() {
                         pick = i;
                     });
+                    onResize(function() {
+                        rect.setAttribute("x",textX());
+                    })
                 });
             },
 
