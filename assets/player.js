@@ -49,6 +49,7 @@ class Player {
     }
 
     shoot(willbreak) {
+        Audio.sfx(sounds.shot);
         if(!willbreak) {
             this.score.value += this.selectedChip.shot.dmg;
         };

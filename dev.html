@@ -13,7 +13,7 @@
     </head>
     <body>
         <svg id="game" tabindex="0" width="100%" height="500">
-
+            <text>Game either loading or broken.</text>
         </svg>
 
         <svg xmlns="http://www.w3.org/2000/svg">
@@ -41,6 +41,11 @@
                 </symbol>
         </svg>
 
+        <audio src="sound/sfx/burst.mp3" id="sfx_burst"></audio>
+        <audio src="sound/sfx/shot.mp3" id="sfx_shot"></audio>
+        <audio src="sound/music/menu.mp3" id="music_menu"></audio>
+        <audio src="sound/music/duel.mp3" id="music_duel" volume="0.5"></audio>
+
         <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="31.865231" height="46.86792" viewBox="0 0 31.865231 46.867918"><defs><linearGradient xlink:href="#a" id="b" x1="388.45822" y1="373.02527" x2="345.68195" y2="373.64523" gradientUnits="userSpaceOnUse"/><linearGradient id="a"><stop offset="0" stop-color="#e87a42"/><stop offset="1" stop-color="#e87a42" stop-opacity="0"/></linearGradient></defs><g fill-rule="evenodd"><path d="m 388.58221,389.51584 0,-28.7655 -21.07817,-10.66307 8.18329,6.94339 -9.1752,1.2399 2.97574,3.96765 4.21563,3.71968 -6.69542,4.46361 10.4151,5.7035 -11.40701,8.18329 4.21564,2.72777 -5.70351,9.91913 z" fill="url(#b)" transform="translate(-329.78167,-480.35682) translate(-26.935314,130.26955)"/><path d="M371.59568 373.8932l-1.61186 5.45552-4.95956 2.97574-1.48787-7.56334 3.3477 1.61186zM365.02426 360.62636l-8.30728-2.72777 4.95957 3.71968zM365.64421 364.59401l-3.4717 0-.12399 1.23989-1.98383-.74393-.49596 3.22372 2.47979 2.35579zM364.28032 386.16813l1.73585.99192-5.08356 6.94339-2.35579-4.09164 1.36388-5.7035z" fill="#219" transform="translate(-329.78167,-480.35682) translate(-26.935314,130.26955)"/></g></svg>
 
         <script src="assets/basic.js" charset="utf-8"></script>
@@ -49,6 +54,7 @@
         <script src="assets/player.js" charset="utf-8"></script>
         <script src="assets/engine.js" charset="utf-8"></script>
         <script src="assets/graphics.js" charset="utf-8"></script>
+        <script src="assets/audio.js" charset="utf-8"></script>
         <script src="assets/game.js" charset="utf-8"></script>
     </body>
 </html>

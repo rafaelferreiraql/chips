@@ -9,7 +9,15 @@ function gameGraphics() {
 
         global: {
 
+            drawBackground: function() {
+                let bg = canvas.node.appendChild(svgDraw("rect"));
+                bg.style.width = canvas.width;
+                bg.style.height = canvas.height;
+                bg.style.fill = "#ddd"
+            },
+
             start: function() {
+                let background = this.drawBackground();
                 let singleButton = this.drawOption(mid,5,"Single Player",
                     global.singlePlayer);
 
@@ -372,7 +380,8 @@ function gameGraphics() {
                 // chipY divided by 10 because of transform, again
                 shot.style.cy = parseInt(chip.getAttribute("y")/10)+chipsize/2;
                 shot.style.r = 10;
-                shot.style.strokeWidth = 1;
+                shot.style.strokeWidth = 1.5;
+                shot.style.stroke = "black";
                 shot.style.fill = shots[chipType.shot].color;
                 lunar.addClass(shot,"shot "+chipType.shot);
 
@@ -405,6 +414,7 @@ function gameGraphics() {
             },
 
             eraseShot: function(shot,type) {
+                Audio.sfx(sounds.burst);
                 canvas.node.getElementsByClassName(type)[0].remove();
             },
 
@@ -445,7 +455,7 @@ function gameGraphics() {
                 window.setTimeout(function() {
                     Array.from(canvas.node.getElementsByClassName("burst")).forEach(
                     (el) => el.remove())
-                },2000);
+                },200);
             },
 
             switch: function(chipdata1,chipdata2,player) {

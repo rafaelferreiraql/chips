@@ -6,6 +6,9 @@ function gameEngine() {
             Graphics = Game.Graphics;
             canvas = gameCanvas;
             global = Game.Engine.global;
+            Audio = Game.Audio;
+            sounds = Audio.sounds;
+            tracks = Audio.tracks;
 
             // Types of shots
             shots = {
@@ -60,7 +63,13 @@ function gameEngine() {
                 }
             }
 
-            chipWheel = [types.water,types.ice,types.fire,types.light,types.shadow];
+            chipWheel = [
+                types.water,
+                types.ice,
+                types.fire,
+                types.light,
+                types.shadow
+            ];
 
             // Previously a placeholder, now it's default.
             p1chips = range(5).map(() => chipWheel[Math.floor(Math.random()*5)]);
@@ -83,19 +92,47 @@ function gameEngine() {
                 chips: p2chips,
                 keys: ["35","40","34","37","12"],
             }
-            global.start();
-            //combat.start(); //Left this one here for debugging
+
+            this.gameLoad();
+
+            //combat.start(); //Left this one here just for debugging
+        },
+
+        // Checks when all assets are loaded, and then runs the game
+        gameLoad: function() {
+            let soundlist = Array.from(document.getElementsByTagName("audio"));
+
+            function audioLoaded(audio) {
+                let promise = new Promise(fulfill => {
+                    audio.oncanplaythrough = function() {
+                        fulfill(audio);
+                    }
+                });
+                return promise;
+            }
+
+            Array.from(document.getElementsByTagName("audio")).every(function(file) {
+                return file.readyState === 4;
+            })
+
+            // Game launches; Promise reads all stuff that needs to be loaded,
+            // then fires global.start() when done.
+            Promise.all([
+                new FontFaceObserver('MenuFont').load(),
+                ].concat(soundlist.map(audioLoaded))
+            ).then(global.start);
         },
 
         global: {
 
             data: {
-                
+
             },
 
             start: function() {
                 canvas.node.innerHTML = "";
                 global.data.menu = "main";
+                Audio.music.play(tracks.menu);
                 Graphics.global.start();
             },
 
@@ -146,6 +183,8 @@ function gameEngine() {
                     console.log(k.keyCode);
                 }
 
+                Audio.music.play(tracks.duel);
+
                 Graphics.combat.start();
             },
 
@@ -181,6 +220,10 @@ function gameEngine() {
                     P1.chips[P1.selected-1],P2.chips[P2.selected-1]));
                 P2.shoot(this.willBreak(
                     P2.chips[P2.selected-1],P1.chips[P1.selected-1]));
+
+                Audio.sfx(sounds.shot);
+                // Ideally, I'd use Web Audio API with panning for individual shots,
+                // but I'll avoid using it right now since it's experimental.
             },
 
             willBreak: function(thisChip,otherChip) {

@@ -13,7 +13,7 @@
     </head>
     <body>
         <svg id="game" tabindex="0" width="100%" height="500">
-
+            <text>Game either loading or broken.</text>
         </svg>
 
         <svg xmlns="http://www.w3.org/2000/svg">
@@ -38,12 +38,18 @@
                 </symbol>
         </svg>
 
+        <audio src="sound/sfx/burst.mp3" id="sfx_burst"></audio>
+        <audio src="sound/sfx/shot.mp3" id="sfx_shot"></audio>
+        <audio src="sound/music/menu.mp3" id="music_menu"></audio>
+        <audio src="sound/music/duel.mp3" id="music_duel" volume="0.5"></audio>
+
         <script src="assets/basic.js" charset="utf-8"></script>
 
         <script src="assets/ai.js" charset="utf-8"></script>
         <script src="assets/player.js" charset="utf-8"></script>
         <script src="assets/engine.js" charset="utf-8"></script>
         <script src="assets/graphics.js" charset="utf-8"></script>
+        <script src="assets/audio.js" charset="utf-8"></script>
         <script src="assets/game.js" charset="utf-8"></script>
 
         <p>

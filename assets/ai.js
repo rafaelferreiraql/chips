@@ -44,6 +44,7 @@ class BasicAI extends AI {
         }
 
         const chosenChip = this.choose(options);
+        //const chosenChip = this.choose([0,0,0,0,0]) // DEBUG!!
 
         return this.player.chips[chosenChip].id;
     }
@@ -166,19 +167,26 @@ class BasicAIPlus extends BasicAI {
     // That guarantees the AI will be "rational" but less predictable.
 
     choose(options) {
-        // sets all values as positive (starting from 0)
-        const normalized = options.map(function(option,i) {
-            return option - Math.min.apply(0,options);
-        });
+        let choice;
+        if(options.every(value => value === 0)) {
+            choice = Math.floor(Math.random()*5);
+        }
 
-        // Sets array values as "zones" for the RNG to fit in
-        const probabilistic = normalized.map(function(value,index) {
-            return value + sum(normalized.slice(0,index));
-        });
+        else {
+            // sets all values as positive (starting from 0)
+            const normalized = options.map(function(option,i) {
+                return option - Math.min.apply(0,options);
+            });
 
-        let RNG = Math.random() * sum(normalized);
-        let choice = probabilistic.findIndex(value => RNG < value);
+            // Sets array values as "zones" for the RNG to fit in
+            const probabilistic = normalized.map(function(value,index) {
+                return value + sum(normalized.slice(0,index));
+            });
 
+            let RNG = Math.random() * sum(normalized);
+            choice = probabilistic.findIndex(value => RNG < value);
+        }
+        console.log(choice);
         return choice;
 
     }

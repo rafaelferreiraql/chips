@@ -3,23 +3,26 @@
 // to make life easier.
 let Game = function() {
 
-    let combat, Graphics;
+    let combat, Graphics, Audio;
+    // Will be defined in Engine.init()
+
+    let sounds, tracks;
     // Will be defined in Engine.init()
 
     let chipData;
     // Will be defined in combat.start()
 
     let canvas;
-    // The game container, defined in Engine.init();
+    // The game container, defined in Engine.init()
 
     let p1data, p2data;
-    // Player data, defines unique properties of each player;
+    // Player data, defines unique properties of each player
 
     let shots, types;
-    // data on types of shots and chips;
+    // data on types of shots and chips
 
     let P1, P2;
-    // The players, defined in combat.start();
+    // The players, defined in combat.start()
 
     return {
 
@@ -27,9 +30,9 @@ let Game = function() {
 
         Graphics: gameGraphics(),
 
+        Audio: gameAudio(),
+
     } // Close Return
 }();
 
-new FontFaceObserver('MenuFont').load().then(function() {
-    Game.Engine.init();
-});
+Game.Engine.init();
