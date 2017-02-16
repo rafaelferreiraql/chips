@@ -3,17 +3,42 @@ function gameGraphics() {
     let canvas = gameCanvas;
     // Already defined in Engine.init(), but Graphics.combat.data needs this
     // since it's not called. Might try to populate it on Engine.init().
-    let mid = () => {return canvas.width/2;};
+    let mid = (pad=0) => {
+        return canvas.width/2 + pad;
+    };
 
     return {
 
         global: {
 
             drawBackground: function() {
-                let bg = canvas.node.appendChild(svgDraw("rect"));
-                bg.style.width = canvas.width;
-                bg.style.height = canvas.height;
-                bg.style.fill = "#ddd"
+                if(!canvas.node.getElementById("background")) {
+                    let bg = canvas.node.appendChild(svgDraw("rect"));
+                    bg.style.width = canvas.width;
+                    bg.style.height = canvas.height;
+                    bg.style.fill = "rgb(90,90,90)";
+                    bg.id = "background";
+                    let animateBG = setInterval(frame,50);
+                    let r = {v: 120, d: 1, s: 1};
+                    let g = {v: 80, d: 1, s: 0.9};
+                    let b = {v: 160, d: 1, s: 0.8};
+                    let rgb;
+                    function frame() {
+                        // CSS colors can't handle decimal values,
+                        // so Math.round is required
+                        bg.style.fill =
+                        `rgb(${Math.round(r.v)},${Math.round(g.v)},${Math.round(b.v)})`;
+
+                        [r,g,b].forEach(c => {
+                            if(c.v < 60 || c.v > 180) c.s = -c.s;
+                            c.v += c.s;
+                        });
+                    }
+                    onResize(function() {
+                        bg.style.width = canvas.width;
+                        bg.style.height = canvas.height;
+                    });
+                }
             },
 
             start: function() {
@@ -34,6 +59,8 @@ function gameGraphics() {
             single: function() {
                 let start = this.drawOption(mid,1,"Start!",combat.start);
                 this.chipSelect(p1data.chips,"left",3,"P1");
+
+                this.drawOption("right",11,"Back",global.start);
             },
 
             multi: function() {
@@ -44,6 +71,8 @@ function gameGraphics() {
 
                 this.chipSelect(p1data.chips,"left",3,"P1");
                 this.chipSelect(p2data.chips,"right",3,"P2");
+
+                this.drawOption("right",11,"Back",global.start);
             },
 
             cpu: function() {
@@ -51,16 +80,19 @@ function gameGraphics() {
 
                 this.chipSelect(p1data.chips,"left",3,"P1");
                 this.chipSelect(p2data.chips,"right",3,"P2");
+
+                this.drawOption("right",11,"Back",global.start);
             },
 
             configScreen: function() {
-                let back = this.drawOption(mid,1,"Return",global.start);
-                let p1config = this.drawOption("left",3,"Config P1 Keys",() => {
+                let p1config = this.drawOption("left",1,"Config P1 Keys",() => {
                     this.keyConfig("p1");
                 });
-                let p2config = this.drawOption("right",3,"Config P2 Keys",() => {
+                let p2config = this.drawOption("right",1,"Config P2 Keys",() => {
                     this.keyConfig("p2");
                 });
+
+                this.drawOption("right",11,"Back",global.start);
             },
 
             keyConfig: function(player) {
@@ -115,15 +147,16 @@ function gameGraphics() {
                 box.style.opacity = 1;
                 box.style.rx, box.style.ry = round;
                 box.style.strokeWidth = 2;
-                box.style.transition = "fill stroke 0.1s linear";
+                box.style.transition = "fill 0.1s";
+
                 function boxColors() { // For reuse in mouseout event
-                    box.style.fill = "grey";
-                    box.style.stroke = "blue";
+                    box.style.fill = "black";
+                    box.style.stroke = "green";
                 }
                 boxColors();
                 box.addEventListener("mouseover",() => {
-                    box.style.fill = "blue";
-                    box.style.stroke = "green"
+                    box.style.fill = "grey";
+                    box.style.stroke = "black"
                 });
                 box.addEventListener("mouseout",boxColors);
 
@@ -143,7 +176,7 @@ function gameGraphics() {
                     box.style.x = svgText.getAttribute("x") - pad;
                 })
 
-                return box;
+                return {"box": box, "text": svgText};
             },
 
             drawText: function(xFunction,yFraction,text,e,pad=0) {
@@ -165,7 +198,7 @@ function gameGraphics() {
                         xFunction = original;
                     }
                     else {
-                        button.setAttribute("x",xFunction() - button.getBBox().width/2);
+                        button.setAttribute("x",xFunction() - button.getBBox().width/2 + pad);
                     }
                 }
                 set_X();
@@ -206,7 +239,7 @@ function gameGraphics() {
 
                     let changeDeck = function() {
                         chips[pick] = chip;
-                        if(global.data.menu !== "multi") {
+                        if(global.data.screen !== "multi") {
                             canvas.node.getElementsByClassName(p+" "+pick)[0].style.fill =
                                 chip.color;
                         }
@@ -230,7 +263,7 @@ function gameGraphics() {
                     let rect = canvas.node.appendChild(svgDraw("rect"));
                     rect.setAttribute("x",textX());
                     rect.setAttribute("y",canvas.height/12*(yFraction+2.25+(i*1.2)));
-                    if(global.data.menu !== "multi") rect.style.fill = chip.color;
+                    if(global.data.screen !== "multi") rect.style.fill = chip.color;
                     rect.style.height = 40;
                     rect.style.width = 40;
                     lunar.addClass(rect,p+" "+i)
@@ -248,7 +281,10 @@ function gameGraphics() {
         combat: {
 
             start: function() {
-                canvas.node.innerHTML = "";
+                // Clears everything on the SVG DOM, including background
+                fullClear();
+                // Differs from global.drawBackground
+                Graphics.combat.drawBackground();
                 P1.draw();
                 P2.draw();
                 P1.drawScore();
@@ -274,6 +310,11 @@ function gameGraphics() {
                 }),
             },
 
+            drawBackground: function() {
+                let bgpic = canvas.node.appendChild(svgDraw("image"));
+                bgpic.setAttribute("href","graphics/background.png");
+            },
+
             drawChips: function(player) {
                 const self = this;
                 this.data.positions = this.data.grid.map(function(pos) {
@@ -282,27 +323,33 @@ function gameGraphics() {
                 this.data.grid.forEach(function(pos,index) {
                     let scaleFactor = self.data.chipScale;
                     let dim = self.data.chipDim;
-                    let rect = canvas.node.appendChild(svgDraw("use"));
+                    let chip = canvas.node.appendChild(svgDraw("use"));
                     // The assignment below MUST be different if we introduce chips
                     // whose name is different from its respective shots.
                     let chipname = player.chips[index].type.shot;
-                    rect.setAttribute("href","#chip"+chipname);
-                    rect.setAttribute("transform",`scale(${1/scaleFactor})`);
+                    chip.setAttribute("href","#chip"+chipname);
+                    chip.setAttribute("transform",`scale(${1/scaleFactor})`);
                     // Mutliplying by 10 because of the transform!
-                    rect.setAttribute("x",(player.left ? player.X : player.X-dim)*scaleFactor);
-                    rect.setAttribute("y",self.data.positions[index]*scaleFactor);
+                    chip.setAttribute("x",(player.left ? player.X : player.X-dim)*scaleFactor);
+                    chip.setAttribute("y",self.data.positions[index]*scaleFactor);
+                    chip.style.stroke = "white"
+                    chip.style.strokeWidth = 0
 
                     // Note: the class will refer always to the ID.
                     // When fetching the chip on the DOM, remember it's the ID,
                     // not the position!
-                    lunar.addClass(rect, `chip ${index+1} ${player.tag}`);
+                    lunar.addClass(chip, `chip ${index+1} ${player.tag}`);
 
-                    rect.onclick = function() {combat.select(
-                        player.chips.findIndex(chip=>chip.id === index+1)+1,player)}
+                    chip.onclick = function() {
+                        combat.select(
+                            player.chips.findIndex(playerChip => playerChip.id === index+1)+1,
+                            player
+                        );
+                    }
 
                     onResize(function() {
                         player.X = player.setX();
-                        rect.setAttribute("x",(player.left ? player.X : player.X-dim)*10);
+                        chip.setAttribute("x",(player.left ? player.X : player.X-dim)*10);
                     })
                 })
             },
@@ -310,15 +357,16 @@ function gameGraphics() {
             score: function(player) {
                 let score;
                 if(!canvas.node.getElementsByClassName(player.tag+" score")[0]) {
-                    score = canvas.node.appendChild(svgDraw("text"));
-                    let size = 50;
-                    score.setAttribute("x",
-                        player.left ? canvas.width/2 - 100 : canvas.width/2 + 100);
-                    score.setAttribute("y",
-                        canvas.height - this.data.chipDim);
-                    score.style.fontSize = size;
-                    score.style.userSelect = "none";
-                    score.innerHTML = player.score.value;
+
+                    score = Graphics.global.drawText(
+                        mid,
+                        11,
+                        player.score.value,
+                        null,
+                        (player.left ? -100 : 100)
+                    );
+                    score.style.stroke = "white";
+                    score.style.strokeWidth = "1px";
                     lunar.addClass(score,player.tag+" score")
                 }
                 else {
@@ -329,42 +377,28 @@ function gameGraphics() {
 
                 onResize(function() {
                     let pad = 100;
-                    score.setAttribute("x",player.left ? canvas.width/2 - pad : canvas.width/2 + pad)
+                    score.setAttribute("x",player.left ? mid(-100) : mid(100))
                 });
 
             },
 
             newTurnPH: function() {
-                let turner = canvas.node.getElementsByClassName("nextTurn")[0]
+                let turner = canvas.node.getElementsByClassName("nextTurn");
+                let text;
+
                 if(turner) { // Turn button is already rendered
-                    let text;
-                    if(combat.data.turn === combat.data.lastTurn) text = "End";
-                    else if((combat.data.turn + 1) % 5 !== 0) text = "Shoot!";
-                    else text = "Switch!";
-
-                    turner.innerHTML = text;
+                    Array.from(turner).forEach(function(turnerElement) {
+                        canvas.node.removeChild(turnerElement);
+                    });
                 }
 
-                else { // Turn button is not rendered
-                    turner = canvas.node.appendChild(svgDraw("text"));
-                    lunar.addClass(turner,"nextTurn");
+                if(combat.data.turn === combat.data.lastTurn) text = "End";
+                else if((combat.data.turn + 1) % 5 === 0) text = "Switch!";
+                else text = "Shoot!";
 
-                    turner.innerHTML = "Shoot!";
-
-                    turner.style.userSelect = "none";
-                    turner.style.fontSize = 40;
-
-                    turner.setAttribute("height",30);
-                    turner.setAttribute("width",30);
-                    turner.setAttribute("fill","green");
-                    turner.setAttribute("x",canvas.width/2 - turner.getBBox().width/2);
-                    turner.setAttribute("y",40);
-                    turner.addEventListener("click",combat.newTurn);
-                }
-
-                onResize(function() {
-                    turner.setAttribute("x",canvas.width/2 - turner.getBBox().width/2);
-                })
+                turner = Graphics.global.drawOption(mid,1,text,combat.newTurn);
+                lunar.addClass(turner.text,"nextTurn");
+                lunar.addClass(turner.box,"nextTurn");
             },
 
             shoot: function(player,half=false) {
@@ -426,8 +460,8 @@ function gameGraphics() {
                 burst.setAttribute("width",dimensions.width);
                 burst.setAttribute("height",dimensions.height);
 
-                burst.setAttribute("x",coords[0]);
-                burst.setAttribute("y",coords[1]);
+                burst.setAttribute("x",coords[0] - dimensions.width);
+                burst.setAttribute("y",coords[1] - dimensions.height/2);
                 burst.setAttribute("href","#shotburst");
 
                 // Troublesome because the gradient is already ID'ed before on the code
@@ -448,14 +482,17 @@ function gameGraphics() {
                     // Horizontal flip and retranslating because of mirroring
                     let x = 2*(burst.getBBox().x + burst.getBBox().width);
                     burst.setAttribute("transform",`scale(-1,1) translate(${-x},0)`);
-                    console.log(x);
-                    console.log(burst.getBBox().x);
                 }
 
                 window.setTimeout(function() {
                     Array.from(canvas.node.getElementsByClassName("burst")).forEach(
                     (el) => el.remove())
                 },200);
+            },
+
+            chipSelected: function(lastSelected,nowSelected) {
+                nowSelected.style.strokeWidth = 10;
+                lastSelected.style.strokeWidth = 0;
             },
 
             switch: function(chipdata1,chipdata2,player) {
@@ -503,9 +540,6 @@ function gameGraphics() {
 
                         chip1.setAttribute("y",position1);
                         chip2.setAttribute("y",position2);
-
-                        //chip1.style.y = position1;
-                        //chip2.style.y = position2;
                     }
                 }
             },
@@ -521,13 +555,14 @@ function gameGraphics() {
                 else {
                     winner = "Player 2";
                 }
-                canvas.node.innerHTML = "";
-                let endText = canvas.node.appendChild(svgDraw("text"));
-                endText.innerHTML = `${winner} won! Try again?`;
-                endText.style.fontSize = 50;
-                endText.setAttribute("y",50);
-                endText.addEventListener("click",combat.start);
-                canvas.node.onkeydown = null;
+                fullClear();
+                let endText = Graphics.global.drawOption(
+                    mid,1,`${winner} won! Try again?`,combat.start
+                )
+
+                let goBack = Graphics.global.drawOption(
+                    mid,11,"Back to Menu",global.start
+                )
             },
 
             debug: function() {

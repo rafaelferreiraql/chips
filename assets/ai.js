@@ -168,16 +168,17 @@ class BasicAIPlus extends BasicAI {
 
     choose(options) {
         let choice;
-        if(options.every(value => value === 0)) {
+
+        // sets all values as positive (starting from 0)
+        const normalized = options.map(function(option,i) {
+            return option - Math.min.apply(0,options);
+        });
+
+        if(normalized.every(value => value === 0)) {
             choice = Math.floor(Math.random()*5);
         }
 
         else {
-            // sets all values as positive (starting from 0)
-            const normalized = options.map(function(option,i) {
-                return option - Math.min.apply(0,options);
-            });
-
             // Sets array values as "zones" for the RNG to fit in
             const probabilistic = normalized.map(function(value,index) {
                 return value + sum(normalized.slice(0,index));
@@ -186,6 +187,7 @@ class BasicAIPlus extends BasicAI {
             let RNG = Math.random() * sum(normalized);
             choice = probabilistic.findIndex(value => RNG < value);
         }
+
         console.log(choice);
         return choice;
 

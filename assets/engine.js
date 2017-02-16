@@ -100,66 +100,92 @@ function gameEngine() {
 
         // Checks when all assets are loaded, and then runs the game
         gameLoad: function() {
-            let soundlist = Array.from(document.getElementsByTagName("audio"));
+            let preloader = canvas.node.appendChild(svgDraw("text"));
+            preloader.innerHTML = "Loading assets, please wait..."
+            preloader.setAttribute("y",canvas.height/2);
 
-            function audioLoaded(audio) {
-                let promise = new Promise(fulfill => {
-                    audio.oncanplaythrough = function() {
-                        fulfill(audio);
-                    }
-                });
-                return promise;
+            try {
+                let soundlist = Array.from(document.getElementsByTagName("audio"));
+
+                function audioLoaded(audio) {
+                    let promise = new Promise(fulfill => {
+                        audio.oncanplaythrough = function() {
+                            fulfill(audio);
+                        }
+                    });
+                    return promise;
+                }
+
+                function pictureLoaded(pic) {
+                    let promise = new Promise(fulfill => {
+                        pic.onload = function() {
+                            fulfill(pic);
+                        }
+                    });
+                    return promise;
+                }
+
+                // Game launches; Promise reads all stuff that needs to be loaded,
+                // then fires global.start() when done.
+                Promise.all([
+                    new FontFaceObserver('MenuFont').load(),
+                    pictureLoaded(document.getElementById("img_bg"))
+                    ].concat(soundlist.map(audioLoaded))
+                ).then(global.start);
             }
 
-            Array.from(document.getElementsByTagName("audio")).every(function(file) {
-                return file.readyState === 4;
-            })
-
-            // Game launches; Promise reads all stuff that needs to be loaded,
-            // then fires global.start() when done.
-            Promise.all([
-                new FontFaceObserver('MenuFont').load(),
-                ].concat(soundlist.map(audioLoaded))
-            ).then(global.start);
+            catch(e) {
+                preloader.innerHTML = "Something's gone wrong :(";
+            }
         },
 
         global: {
 
             data: {
-
+                screen: null,
+                ingame: null,
             },
 
             start: function() {
-                canvas.node.innerHTML = "";
-                global.data.menu = "main";
-                Audio.music.play(tracks.menu);
+                if(global.data.screen === null || global.data.screen === "ingame") {
+                    fullClear();
+                    Audio.music.play(tracks.menu);
+                }
+                else {
+                    clearDOM();
+                }
+
+                global.data.screen = "main";
                 Graphics.global.start();
             },
 
             singlePlayer: function() {
                 p2data.ai = BasicAIPlus;
-                global.data.menu = "single";
-                canvas.node.innerHTML = "";
+                global.data.screen = "single";
+                global.data.ingame = "single";
+                clearDOM();
                 Graphics.global.single();
             },
 
             multiPlayer: function() {
-                global.data.menu = "multi";
-                canvas.node.innerHTML = "";
+                global.data.ingame = "multi";
+                global.data.screen = "multi";
+                clearDOM();
                 Graphics.global.multi();
             },
 
             cpu: function() {
                 p1data.ai = BasicAIPlus;
                 p2data.ai = BasicAIPlus;
-                global.data.menu = "cpu";
-                canvas.node.innerHTML = "";
+                global.data.ingame = "cpu";
+                global.data.screen = "cpu";
+                clearDOM();
                 Graphics.global.cpu();
             },
 
             keyConfig: function() {
-                canvas.node.innerHTML = "";
-                global.data.menu = "config";
+                clearDOM();
+                global.data.screen = "config";
                 Graphics.global.configScreen();
             }
 
@@ -173,6 +199,7 @@ function gameEngine() {
             },
 
             start: function() {
+                global.data.screen = "ingame";
                 P1 = new Player(p1data);
                 P2 = new Player(p2data);
 
@@ -241,6 +268,12 @@ function gameEngine() {
             select: function(sel,player) {
                 // "sel" is the position (from 1 to 5).
                 if(sel > 0 && sel < 6) {
+                    if(global.data.ingame === "single") { // REVIEW THIS PART!
+                        Graphics.combat.chipSelected(
+                            canvas.node.getElementsByClassName(`chip ${player.selected} ${player.tag}`)[0],
+                            canvas.node.getElementsByClassName(`chip ${sel} ${player.tag}`)[0]
+                        );
+                    }
                     player.updateSelection(sel);
                 }
                 // Else, selection is not valid and nothing will happen.
