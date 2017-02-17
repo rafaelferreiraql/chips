@@ -147,6 +147,10 @@ function gameEngine() {
             },
 
             start: function() {
+                // Does whatever's necessary to do with audio before the game's loaded
+                // For example, alter the volume of a louder track like the duel one
+                Audio.init();
+
                 if(global.data.screen === null || global.data.screen === "ingame") {
                     fullClear();
                     Audio.music.play(tracks.menu);
@@ -207,7 +211,6 @@ function gameEngine() {
 
                 canvas.node.onkeydown = function(k) {
                     let keys = [P1.keycodes,P2.keycodes];
-                    console.log(k.keyCode);
                 }
 
                 Audio.music.play(tracks.duel);
@@ -268,10 +271,9 @@ function gameEngine() {
             select: function(sel,player) {
                 // "sel" is the position (from 1 to 5).
                 if(sel > 0 && sel < 6) {
-                    if(global.data.ingame === "single") { // REVIEW THIS PART!
+                    if(global.data.ingame === "single") {
                         Graphics.combat.chipSelected(
-                            canvas.node.getElementsByClassName(`chip ${player.selected} ${player.tag}`)[0],
-                            canvas.node.getElementsByClassName(`chip ${sel} ${player.tag}`)[0]
+                            canvas.node.getElementsByClassName(`${player.chips[sel-1].id} ${player.tag}`)[0]
                         );
                     }
                     player.updateSelection(sel);

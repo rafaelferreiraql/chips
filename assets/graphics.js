@@ -54,6 +54,10 @@ function gameGraphics() {
 
                 let configButton = this.drawOption(mid,11,"Config keys (experimental!)",
                     global.keyConfig);
+
+                this.drawLogo();
+
+                Graphics.combat.toggleAudio("left",1);
             },
 
             single: function() {
@@ -61,6 +65,7 @@ function gameGraphics() {
                 this.chipSelect(p1data.chips,"left",3,"P1");
 
                 this.drawOption("right",11,"Back",global.start);
+                Graphics.combat.toggleAudio("right",9.5);
             },
 
             multi: function() {
@@ -73,6 +78,7 @@ function gameGraphics() {
                 this.chipSelect(p2data.chips,"right",3,"P2");
 
                 this.drawOption("right",11,"Back",global.start);
+                Graphics.combat.toggleAudio("right",9.5);
             },
 
             cpu: function() {
@@ -82,6 +88,20 @@ function gameGraphics() {
                 this.chipSelect(p2data.chips,"right",3,"P2");
 
                 this.drawOption("right",11,"Back",global.start);
+                Graphics.combat.toggleAudio("right",9.5);
+            },
+
+            drawLogo: function() {
+                let logo = canvas.node.appendChild(svgDraw("use"));
+                logo.setAttribute("href","#gamelogo");
+                logo.setAttribute("width",314.59872);
+                logo.setAttribute("height",100);
+                console.log(logo.getBBox());
+                logo.setAttribute("x",canvas.width/2 - logo.getBBox().width/2);
+                logo.setAttribute("y",canvas.height/12);
+                onResize(function() {
+                    logo.setAttribute("x",canvas.width/2 - logo.getBBox().width/2);
+                })
             },
 
             configScreen: function() {
@@ -93,6 +113,7 @@ function gameGraphics() {
                 });
 
                 this.drawOption("right",11,"Back",global.start);
+                Graphics.combat.toggleAudio("right",9.5);
             },
 
             keyConfig: function(player) {
@@ -291,6 +312,7 @@ function gameGraphics() {
                 P2.drawScore();
                 //this.debug(); // For various debug purposes
                 Graphics.combat.newTurnPH();
+                Graphics.combat.toggleAudio("left",11.25);
                 canvas.node.onkeydown = function(k) {
                     combat.select(P1.keycodes.indexOf(k.keyCode)+1,P1);
                     combat.select(P2.keycodes.indexOf(k.keyCode)+1,P2);
@@ -370,7 +392,6 @@ function gameGraphics() {
                     lunar.addClass(score,player.tag+" score")
                 }
                 else {
-                    console.log("Já criou!");
                     score = canvas.node.getElementsByClassName(player.tag+" score")[0];
                     score.innerHTML = player.score.value;
                 }
@@ -399,6 +420,10 @@ function gameGraphics() {
                 turner = Graphics.global.drawOption(mid,1,text,combat.newTurn);
                 lunar.addClass(turner.text,"nextTurn");
                 lunar.addClass(turner.box,"nextTurn");
+            },
+
+            toggleAudio: function(xFunction,yFraction) {
+                Graphics.global.drawOption(xFunction,yFraction,"Mute",Audio.mute);
             },
 
             shoot: function(player,half=false) {
@@ -490,9 +515,25 @@ function gameGraphics() {
                 },200);
             },
 
-            chipSelected: function(lastSelected,nowSelected) {
-                nowSelected.style.strokeWidth = 10;
-                lastSelected.style.strokeWidth = 0;
+            chipSelected: function(chip) {
+                const initial = 20;
+                let thickness = initial;
+                chip.style.strokeWidth = thickness;
+
+                const duration = 500;
+                const step = 5;
+
+                let animation = setInterval(frame,step);
+                function frame() {
+                    if(thickness < 0.1) {
+                        clearInterval(animation);
+                    }
+                    else {
+                        thickness -= initial/(duration/step);
+                        chip.style.strokeWidth = thickness;
+                    }
+
+                }
             },
 
             switch: function(chipdata1,chipdata2,player) {

@@ -187,8 +187,7 @@ class BasicAIPlus extends BasicAI {
             let RNG = Math.random() * sum(normalized);
             choice = probabilistic.findIndex(value => RNG < value);
         }
-
-        console.log(choice);
+        
         return choice;
 
     }

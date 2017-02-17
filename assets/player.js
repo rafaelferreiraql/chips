@@ -56,10 +56,6 @@ class Player {
         Graphics.combat.shoot(this,willbreak);
     }
 
-    select() {
-        console.log("Select");
-    }
-
     swap() {
         let index = this.chips[this.selected-1].pos;
         if(index < 3) {combat.switch(
@@ -72,6 +68,5 @@ class Player {
             this.chips[this.selected-2],
             this);
         }
-        else console.log("No Switch");
     }
 }
