@@ -131,7 +131,7 @@ function gameEngine() {
                     new FontFaceObserver('MenuFont').load(),
                     pictureLoaded(document.getElementById("img_bg"))
                     ].concat(soundlist.map(audioLoaded))
-                ).then(global.start);
+                ).then(global.preloadFinisher);
             }
 
             catch(e) {
@@ -144,6 +144,10 @@ function gameEngine() {
             data: {
                 screen: null,
                 ingame: null,
+            },
+
+            preloadFinisher: function() {
+                Graphics.global.preloadFinisher();
             },
 
             start: function() {

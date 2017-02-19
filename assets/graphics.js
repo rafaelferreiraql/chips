@@ -41,6 +41,11 @@ function gameGraphics() {
                 }
             },
 
+            preloadFinisher: function() {
+                this.drawOption(mid,9,"Play!",global.start);
+                this.drawText(mid,11,"Careful, it has sound!");
+            },
+
             start: function() {
                 let background = this.drawBackground();
                 let singleButton = this.drawOption(mid,5,"Single Player",

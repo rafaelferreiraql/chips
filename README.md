@@ -1,5 +1,5 @@
 # Chips
-A small HTML5 game I'm making. It's now mostly finished, but there's still some adjustments left to make and browser compatibility may be low.
+A small HTML5 game I'm making. It's now mostly finished, but there's still some adjustments left to make and browser compatibility may be low. It's made with almost vanilla JS, no Phaser or Babylon, even jQuery or React, just some tiny libraries here and there for specific purposes.
 
 ## Known bugs
 * In a few select situations, the AI may crash. I still haven't found out why, but it's related to how it decides which chip it'll activate. *Probably fixed! May need more playtesting*
